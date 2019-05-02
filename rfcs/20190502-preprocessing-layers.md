@@ -1,6 +1,6 @@
 # Keras Preprocessing Layers
 
-| Status        | (Proposed / Accepted / Implemented / Obsolete)       |
+| Status        | Proposed      |
 :-------------- |:---------------------------------------------------- |
 | **Author(s)** | Mark Omernick (momernick@google.com), Stan Bileschi (bileschi@google.com), Kester Tong (kestert@google.com), Francois Chollet (fchollet@google.com) |
 | **Updated**   | 2019-05-01                                           |
