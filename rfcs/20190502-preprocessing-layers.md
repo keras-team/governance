@@ -37,7 +37,7 @@ In particular, we expect preprocessing layers to make it easier to serve models 
 Case where a user has a single preprocessing layer to do image normalization.
 
 ```python
-normalization = keras.layers.Normalization()
+normalization = keras.layers.Normalization(axis=-1)
 normalization.adapt(data_sample)
 
 model = keras.Sequential([
@@ -50,7 +50,7 @@ model.fit(data, targets, epochs=10)
 Case where a user has a single preprocessing layer to do text vectorization where each input sample is encoded as a sequence of word indices.
 
 ```python
-vectorization = keras.layers.TextVectorization()
+vectorization = keras.layers.TextVectorization(mode='int')
 vectorization.adapt(data_sample)
 
 model = keras.Sequential([
@@ -65,7 +65,7 @@ model.fit(data, targets, epochs=10)
 Case where a user has a single preprocessing layer to do text vectorization where each input sample is encoded as a dense vector of TF-IDF scores.
 
 ```python
-vectorization = keras.layers.TextVectorization()
+vectorization = keras.layers.TextVectorization(mode='tfidf')
 vectorization.adapt(data_sample)
 
 model = keras.Sequential([
