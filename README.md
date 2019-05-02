@@ -29,7 +29,7 @@ Role: final call in decisions related to the Keras API. Must approve all changes
 ### Committee chairs
 
 Role: represent the interests of different stakeholders during design discussions.
-Selection process: From time to time the chairs may revise the group's membership to ensure the project's interests are well represented.
+Selection process: From time to time, the chairs may revise the group's membership to ensure the project's interests are well represented.
 
 Key stakeholders:
 
@@ -66,7 +66,7 @@ The process for writing and submitting design proposals is same as the [TensorFl
     - Provide enough context information for anyone to undertsand what's going on.
     - Provide a solid argument as for why the feature is neeed.
     - Include a code example of the **end-to-end workflow** you have in mind.
-- Open a Pull Request in the [Keras API proposals folder in this repository](https://github.com/keras-team/governance/rfcs/).
+- Open a Pull Request in the [Keras API proposals folder in this repository](https://github.com/keras-team/governance/tree/master/rfcs).
 - Send the Pull Request link to `keras-users@googlegroups.com` with a subject that starts with `[API DESIGN REVIEW]` (all caps) so that we notice it.
 - Wait for comments, and answer them as they come. Edit the proposal as necessary.
 - The proposal will finally be approved or rejected during a meeting of the Keras SIG chairs. Once approved, you can send out Pull Requests to implement the API changes or ask others to write Pull Requests (targeting `tf.keras` and `keras-team/keras`).
