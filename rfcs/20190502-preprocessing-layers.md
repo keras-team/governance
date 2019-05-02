@@ -55,7 +55,7 @@ vectorization.adapt(data_sample)
 
 model = keras.Sequential([
     vectorization,
-    keras.layers.Emebdding(128),  # The number of int indices is not specified since it is inferred.
+    keras.layers.Embedding(128),  # The number of int indices is not specified since it is inferred.
     keras.layers.LSTM(32),
     keras.layers.Dense(10, activation='softmax'),
 ])
@@ -367,7 +367,7 @@ This is normally done as part of a tf.data pipeline. The current proposal implie
 executed end-to-end on an accelerator.
 
 This means that we need a way to lift the preprocessing part of the model in a tf.data pipeline during model training. In `fit`, we can do this automatically.
-In custom training loops, we will expect the user to do it manually.
+In custom training loops, we will expect the user to do it manually (see subsection "Custom training loops").
 
 We propose the addition of two new methods on the `Model` class:
 
