@@ -150,8 +150,6 @@ There are two ways to instantiate a `PrepocessingStage` layer: either `Sequentia
 
 If any layer other than `PreprocessingLayer` instances is included in a `PrepocessingStage`, these layers will be treated as frozen both during `adapt` and later during `fit`.
 
-```python
-```
 
 #### Normalization
 
