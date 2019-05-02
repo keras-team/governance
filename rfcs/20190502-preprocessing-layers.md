@@ -363,13 +363,13 @@ The following 3 methods should be overridden:
 Some preprocessing ops are CPU-only and benefit from being executed asynchronously on the accelerator host (as opposed to the accelerator itself, e.g. GPU or TPU),
 with a batch of data being prepocessed on the host while the previous batch is being processed by the accelerator. This pattern is known as "async prefetching".
 
-This is normally done as part of a tf.data pipeline. The current proposal implies moving some of that proposing to inside the model itself, which is normally
+This is normally done as part of a tf.data pipeline. The current proposal implies moving some of that preprocessing to inside the model itself, which is normally
 executed end-to-end on an accelerator.
 
 This means that we need a way to lift the preprocessing part of the model in a tf.data pipeline during model training. In `fit`, we can do this automatically.
 In custom training loops, we will expect the user to do it manually.
 
-We propose the additional of two new methods on the `Model` class:
+We propose the addition of two new methods on the `Model` class:
 
 ```python
 def get_preprocessing_stage(self):
@@ -488,8 +488,8 @@ model.fit(dataset, epochs=10)
 
 #### Custom training loops
 
-When writing custom training loops, the user must manually do the lifting the the preprocessing stage
-in the data pipeline:
+When writing custom training loops, the user must manually do the lifting of the preprocessing stage
+into the data pipeline:
 
 ```python
 model = Model(...)
@@ -511,7 +511,7 @@ for x, y in dataset:
         ...
 ```
 
-In general you won't have to refer to `get_preprocessing_stage` and `get_main_stage` directly, because you will
+In general, you won't have to refer to `get_preprocessing_stage` and `get_main_stage` directly, because you will
 probably already have direct handles on your preprocessing layer and the rest of the model:
 
 ```python
