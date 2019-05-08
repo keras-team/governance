@@ -401,7 +401,7 @@ Thus, for any model that starts with preprocessing layers, the following:
 outputs = model(inputs)
 ```
 
-is functionnally equivalent to:
+is functionally equivalent to:
 
 ```python
 preprocessed_inputs = model.get_preprocessing_stage()(inputs)
