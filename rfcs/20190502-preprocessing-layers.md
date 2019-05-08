@@ -238,7 +238,7 @@ This layer has basic options for managing text in the Keras model.
 It is expected that more advanced users needing custom control will uses Keras-compatible layers provided by tf.text.
 
 Transform a batch of strings (one sample = one string) into either a list of token indices
-(one sample = 1D int tensor or a dense representation (1 sample = 1D float vector).
+(one sample = 1D int tensor), or a dense representation (1 sample = 1D float vector).
 
 The processing of each sample unfolds as:
 - Standardize each sample (usually lowercasing + punctuation stripping)
@@ -466,7 +466,7 @@ class MyModel(Model):
         self.submodel = MySubmodel()
 
     def call(self, inputs):
-        return self.submodel(self.preproc_layer)
+        return self.submodel(self.preproc_layer(inputs))
 
     def get_preprocessing_stage(self):
         return self.preproc_layer
