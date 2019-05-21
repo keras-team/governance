@@ -3,7 +3,7 @@
 | Status        | Proposed      |
 :-------------- |:---------------------------------------------------- |
 | **Author(s)** | Mark Omernick (momernick@google.com), Stan Bileschi (bileschi@google.com), Kester Tong (kestert@google.com), Francois Chollet (fchollet@google.com) |
-| **Updated**   | 2019-05-01                                           |
+| **Updated**   | 2019-05-21                                           |
 
 
 ## Objective
@@ -533,6 +533,8 @@ for x, y in dataset:
 
 #### Naming conventions to follow for preprocessing layers
 
+[RESOLUTION: we will use option A]
+
 We have two possible sets of names for the layers:
 
 ##### Option A: Normalization, Discretization, TextVectorization
@@ -547,6 +549,8 @@ Cons: Normalize vs BatchNormalization is jarring.
 
 
 #### Using the name "preprocessing" or "processing"
+
+[RESOLUTION: we will use option A, "preprocessing"]
 
 It has been proposed that we use the name "processing" throughout the API instead of "preprocessing".
 
@@ -570,9 +574,18 @@ Cons: It's very generic, and does not clearly convey the difference between "pre
 
 #### Name to use for `adapt` method
 
+[RESOLUTION: decision delayed until implementation]
+
 We may want to use the name `fit` instead (other suggestions welcome).
 
 Pros of using `fit`: consistency with `model.fit()`, and the `fit` method on `ImageDataGenerator` and `Tokenizer` from the `keras.preprocessing` module.
 Cons of using `fit`: It may confuse users, since `preprocessing_layer.fit()` would have a different signature.
+
+---
+
+[OTHER ADDITIONS FROM DESIGN REVIEW]
+
+- We should decouple the user-facing `adapt(data)` method (or `fit(data)`), and the implementer-facing method, so as to make it easier to implement support for different data formats.
+
 
 
