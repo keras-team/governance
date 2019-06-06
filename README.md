@@ -15,7 +15,7 @@ The SIG covers all aspects of the Keras API, in particular:
 - Design of TensorFlow-specific Keras features to be included in `tf.keras`.
 - Design of the Keras model file format.
 - Design of the API of the subprojects Keras Applications and Keras Preprocessing, which are shared across `tf.keras` and `keras-team/keras`.
-- Design of the API of any Keras-brand project, such as AutoKeras.
+- Design of the API of all Keras-brand projects, such as AutoKeras and Keras-Tuner.
 
 
 ## Leadership
