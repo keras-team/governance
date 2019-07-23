@@ -7,7 +7,7 @@
 
 The purpose of the Keras SIG is to provide a formal structure to supervise the evolution of the Keras API,
 while giving a voice to all keys stakeholders. The SIG consists of a process that anyone can follow to make API proposals,
-and a comittee that reviews the proposals and makes final decisions about what should be in the Keras API.
+public design review meetings, and a comittee that reviews the proposals and makes final decisions about what should be in the Keras API.
 
 The SIG covers all aspects of the Keras API, in particular:
 
@@ -50,9 +50,8 @@ Core Keras community contributors:
 
 ## Design review process
 
-The Keras SIG chairs meet once a month (first Friday of the month at 1pm PT) to discuss current development directions.
-
-In addition, design review meetings focused on a specific design proposal will be set up from time to time.
+The Keras SIG meets once a month (first Friday of the month at 11am PT) to discuss current development directions.
+This is a public meeting open to anyone who is interested: the [agenda and notes are public](http://bit.ly/keras-meeting-notes). To get notifications and a calendar invitation to the public meeting, please join the [keras-meetings Google Group](https://groups.google.com/a/tensorflow.org/forum/#!forum/keras-meetings).
 
 Other communications are expected to happen primarily asynchronously via:
 
