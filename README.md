@@ -17,7 +17,6 @@ The SIG covers all aspects of the Keras API, in particular:
 - Design of the API of the subprojects Keras Applications and Keras Preprocessing, which are shared across `tf.keras` and `keras-team/keras`.
 - Design of the API of all Keras-brand projects, such as AutoKeras and Keras-Tuner.
 
-
 ## Leadership
 
 ### BDFL
@@ -99,6 +98,9 @@ The size of the Keras user base should rise to 500,000 by Q1 2020, and to 1,000,
 
 In everything we do, we should keep in mind the next million developers and the next million problems we are empowering them to solve.
 
+## Code of conduct
+
+In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone. All activity connected with this SIG will abide by the [Code of Conduct](https://github.com/tensorflow/tensorflow/blob/master/CODE_OF_CONDUCT.md).
 
 ## Our values and our strengths
 
