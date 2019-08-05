@@ -80,6 +80,7 @@ def __init__(
     vertical_flip=False,
     rescale=None,
     preprocessing_function=None,
+    postprocessing_function=None,
     data_format='channels_last',
     validation_split=0.0,
     interpolation_order=1,
@@ -141,6 +142,11 @@ def __init__(
             otherwise we multiply the data by the value provided
             (after applying all other transformations).
         preprocessing_function: function that will be applied on each input.
+            The function will run before the image is resized and augmented.
+            The function should take one argument:
+            one image (Numpy tensor with rank 3),
+            and should output a Numpy tensor with the same shape.
+        postprocessing_function: function that will be applied on each input.
             The function will run after the image is resized and augmented.
             The function should take one argument:
             one image (Numpy tensor with rank 3),
@@ -289,7 +295,7 @@ def get_config(self, config):
     # Returns JSON-serializable config dict
 
 def preview(self, data, save_to_directory=None, save_prefix=None, save_format='png'):
-    """Enables users to previous the image augmentation configuration.
+    """Enables users to preview the image augmentation configuration.
 
     # Arguments
         data: Image datra. Could be strings (a list of image paths), a list of PIL image instances,
