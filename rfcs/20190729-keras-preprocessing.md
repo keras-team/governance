@@ -298,7 +298,7 @@ def preview(self, data, save_to_directory=None, save_prefix=None, save_format='p
     """Enables users to preview the image augmentation configuration.
 
     # Arguments
-        data: Image datra. Could be strings (a list of image paths), a list of PIL image instances,
+        data: Image data. Could be strings (a list of image paths), a list of PIL image instances,
             a list of arrays, or a list of eager tensors.
         save_to_directory: Directory to save transformed images. Mandatory if not in a notebook.
             If in a notebook and this is not specified, images are displayed in-line.
