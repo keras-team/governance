@@ -24,7 +24,7 @@ Ideally, the utilities in `keras.preprocessing` should be made compatible with `
 This presents the opportunity to improve on the existing API. In particular we don't have good support
 for image segmentation use cases today.
 
-Some features are also being subplanted by [preprocessing layers](https://github.com/keras-team/governance/blob/master/rfcs/20190502-preprocessing-layers.md), in particular text processing. 
+Some features are also being supplanted by [preprocessing layers](https://github.com/keras-team/governance/blob/master/rfcs/20190502-preprocessing-layers.md), in particular text processing. 
 As a result we may want to deprecate them.
 
 
@@ -298,7 +298,7 @@ def preview(self, data, save_to_directory=None, save_prefix=None, save_format='p
     """Enables users to preview the image augmentation configuration.
 
     # Arguments
-        data: Image datra. Could be strings (a list of image paths), a list of PIL image instances,
+        data: Image data. Could be strings (a list of image paths), a list of PIL image instances,
             a list of arrays, or a list of eager tensors.
         save_to_directory: Directory to save transformed images. Mandatory if not in a notebook.
             If in a notebook and this is not specified, images are displayed in-line.
