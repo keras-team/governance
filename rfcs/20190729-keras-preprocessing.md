@@ -80,7 +80,6 @@ def __init__(
     vertical_flip=False,
     rescale=None,
     preprocessing_function=None,
-    postprocessing_function=None,
     data_format='channels_last',
     validation_split=0.0,
     interpolation_order=1,
@@ -146,8 +145,6 @@ def __init__(
             The function should take one argument:
             one image (array/tensor with rank 3),
             and should output an array/tensor with the same shape.
-        postprocessing_function: function that will be applied on each input.
-            The function will run after the image is resized and augmented.
         data_format: Image data format,
             either "channels_first" or "channels_last".
             "channels_last" mode means that the images should have shape
@@ -189,6 +186,7 @@ def __init__(
     rescale=None,
     resize=None,
     preprocessing_function=None,
+    postprocessing_function=None,
     interpolation_order=1,
     data_format='channels_last',
     dtype='float32'):
@@ -250,10 +248,12 @@ def __init__(
         resize: Tuple of int (height, width). Dimensions to resize
             images to.
         preprocessing_function: function that will be applied on each input.
-            The function will run after the image is resized and augmented.
+            The function will run before the image is resized and augmented.
             The function should take one argument:
-            one image (Numpy tensor with rank 3),
-            and should output a Numpy tensor with the same shape.
+            one image (array/tensor with rank 3),
+            and should output an  array/tensor with the same shape.
+        postprocessing_function: function that will be applied on each input.
+            The function will run after the image is resized and augmented.
         data_format: Image data format,
             either "channels_first" or "channels_last".
             "channels_last" mode means that the images should have shape
