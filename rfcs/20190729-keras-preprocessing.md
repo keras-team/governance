@@ -144,13 +144,10 @@ def __init__(
         preprocessing_function: function that will be applied on each input.
             The function will run before the image is resized and augmented.
             The function should take one argument:
-            one image (Numpy tensor with rank 3),
-            and should output a Numpy tensor with the same shape.
+            one image (array/tensor with rank 3),
+            and should output an array/tensor with the same shape.
         postprocessing_function: function that will be applied on each input.
             The function will run after the image is resized and augmented.
-            The function should take one argument:
-            one image (Numpy tensor with rank 3),
-            and should output a Numpy tensor with the same shape.
         data_format: Image data format,
             either "channels_first" or "channels_last".
             "channels_last" mode means that the images should have shape
