@@ -51,7 +51,7 @@ As a result we may want move the current API to an API similar to Layers.
 
 #### Constructor
 
-`ImagePipeline` inherits from `keras.model.Sequential` and takes a list of layers as inputs. In the future it will inherit from `PreprocessingStage`.
+`ImagePipeline` inherits from `PreprocessingLayer` (or alternatively `keras.model.Sequential`, whose behavior is similar) and takes a list of layers as inputs. In the future it will inherit from `PreprocessingStage`.
 
 `ImagePipeline` is a preprocessing layer that encapsulate a series of image transformations. Since some of these transformations may be trained (featurewise normalization), it exposes the method `adapt`, like all other preprocessing layers.
 
@@ -84,6 +84,7 @@ model.fit(dataset, epochs=10)
 
 ```python
 def from_directory(
+    self,
     directory,
     targets='inferred',
     target_mode='categorical',
@@ -135,6 +136,7 @@ def from_directory(
     """
 
 def from_dataframe(
+    self,
     dataframe,
     directory=None,
     data_column='filename',
@@ -199,6 +201,7 @@ The new data augmentation layers will inherit `keras.layers.Layer` and work in a
 ```python
 Resizing(height, width)  # Resize while distorting aspect ratio
 CenterCrop(height, width)  # Resize without distorting aspect ratio
+RandomCrop(height, width, seed=None)  # Return a (height, width) crop from a random location
 Rescaling(value)  # Divide by `value`
 RandomFlip(horizontal=False, vertical=False, seed=None)
 RandomTranslation(amplitude=0., fill_mode='constant', fill_value=0., seed=None)
@@ -240,12 +243,11 @@ class RandomFlip(PreprocessingLayer):
   def __init__(self, horizontal=False, vertical=False, seed=None):
     self.horizontal = horizontal
     self.vertical = vertical
-    self.seed = seed
-    self._current_seed = seed or random_value()
+    self.seed = seed or random_int()
+    self._rng = rng_from_seed(seed)
 
-  def call(self, inputs, training=None):
-    seed = self._current_seed
-    self._current_seed += 1
+  def call(self, inputs, training=None, seed=None):
+    seed = seed or self._rng.sample()
     if training:
       if self.horizontal:
         inputs = tf.image.random_flip_left_right(inputs, seed=seed)
@@ -292,6 +294,9 @@ target_ds = target_pipeline.from_directory(
 ds = tf.data.Dataset.zip((input_ds, target_ds))
 model.fit(ds)
 ```
+
+Note that the behavior of having the `seed` argument in `from_directory` supercedes the per-layer argument is achieved by using the seed
+to sample new random ints (scalar tensors from `tf.random.experimental.Generator`) to serve as the `call` argument to each underlying layer.
 
 
 ### TimeseriesGenerator
