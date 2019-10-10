@@ -3,11 +3,11 @@
 | Status        | Proposed                              |
 |:--------------|:--------------------------------------|
 | **Author** | Rodrigo Agundez (rragundez@gmail.com) |
-| **Updated**   | 2019-10-9                            |
+| **Updated**   | 2019-09-28                            |
 
 ## Objective
 
-Change the design of `DataFrameIterator` class to be more intuitive and flexible such that the `flow_from_dataframe` method handles:
+Change the design of `DataFrameIterator` class to be more intuitive and flexible such that the `flow_from_dataframe` if `ImageDataGenerator` method handles:
 
 - regression,
 - binary classification,
@@ -21,15 +21,15 @@ Change the design of `DataFrameIterator` class to be more intuitive and flexible
 - custom semi-supervised learning use case,
 - multi-task learning using any combination of the above use cases,
 - multi-input with any of the above use cases,
-- moonshot: multi-input where each input can have different data augmentation.
+- moonshot: multi-input where each input can have different data augmentation,
 
 where the input data type is image data.
 
-I did an initial refactoring in my [fork's branch df-iterator-redesign](https://github.com/rragundez/keras-preprocessing/tree/df-iterator-redesign/keras_preprocessing/image), with some [notebook examples](https://github.com/rragundez/keras-preprocessing/tree/df-iterator-redesign/keras_preprocessing/image/notebook_examples ) where many but not all use cases are covered. NOTE: I have no intention or making a PR of this, but it serves as an example of what can be achieved.
+I did an initial refactoring in my [fork's branch df-iterator-redesign](https://github.com/rragundez/keras-preprocessing/tree/df-iterator-redesign/keras_preprocessing/image), with some [notebook examples](https://github.com/rragundez/keras-preprocessing/tree/df-iterator-redesign/keras_preprocessing/image/notebook_examples ) where many but not all use cases and functionality is covered. NOTE: I have no intention of making a PR with this, but it serves as an example of what can be achieved.
 
 ## Motivation
 
-Currently the `DataFrameIterator` is limited by its design, but it can potentially be used to address numerous use cases. If designed correctly it can serve numerous use cases which are not currently possible and also new use cases can be added.
+Currently the `DataFrameIterator` is limited by its design, but it can potentially be used to address numerous use cases now and new ones in the future.
 
 My proposal is based on two concepts:
 
@@ -37,7 +37,7 @@ My proposal is based on two concepts:
 2. The user should tell us how to transform the data in that column. This is mostly applicable for outputs. For example:
 
     - For an input column: is it an image file (png, jpg, tiff, etc.)?, is it an image in a numpy array format (.npy)? or another format? (this might be better handled automatically by detecting the file extension though.)
-    - For an output column: how do we transform this column (sparse, categorical, raw, bounding box, image augmentation as input, etc.)?
+    - For an output column: how do we transform this column (sparse, categorical, no transformation, bounding box, as image, etc.)?
 
 I believe that by adopting these 2 concepts the objectives can be achieved. It does require a great deal of refactoring and change the way the API is used.
 
@@ -47,12 +47,12 @@ This change will be extremely valuable for anyone with a use case with image dat
 
 I identify the following problems with the current API:
 
-- There is no support if images are in any file format other than picture files (png, jpg, tiff, etc.) for example, as Numpy arrays (npy and npz). Not only is there no support for it, but is very difficult to add it.
-- Setting a seed happens at a global level which I believe is a bad practice. Instead a random state should be created or obtained such that a random process like data augmentation can be repeated is using the random state from it's initial state.
-- Because of the previous point, any use case where the input and output are images (segmentation, image noise removal, upscaling image to a higher resolution, etc.) there is the unnecessary need to create two identical image generators and link them via `zip`. I explain in the proposal description how I think it should work instead.
-- There is currently no support for bounding boxes or landmarks. It is also difficult to add them.
+- There is no support if images are in any file format other than picture files (png, jpg, tiff, etc.) for example, as Numpy arrays (npy and npz). Not only is there no support for it, but is very difficult to add.
+- Setting a seed happens at a global level which I believe is a bad practice. Instead a random state should be created or obtained. Then a random process like data augmentation can be repeated by re-using that random state.
+- Because of the previous point, any use case where the input and output are images (segmentation, image noise removal, upscaling image to a higher resolution, etc.) currently there is the unnecessary need to create two identical image generators and link them via `zip`. I show in this document how I think it should work instead.
+- There is currently no support for bounding boxes or landmarks. It is also difficult to add.
 - There is no general support of all use cases for multi-task learning. Currently there is only the possibility of using the `raw` mode for each task. This means the user has to perform the transformations necessary and then add them to the DataFrame. Example: input the image of a person and output the gender (binary), the race (multi-class) and the age (regression).
-- Binary mode does the same as sparse mode. In this case I would keep the sparse as it encapsulates the binary mode.
+- Binary mode does the same as sparse mode. In this case I would keep the sparse mode and remove the binary mode as sparse mode encapsulates the binary mode.
 
 Related work: I've been adding new use cases to the functionality of `DataFrameIterator`, in particular multi-label and multi-output, but I don't see how to add all the other functionality with the current API. I already started working on the refactoring in my fork of the `keras-preprocessing` repository under the branch `df-iterator-redesign`.
 
@@ -72,8 +72,8 @@ class DataFrameIterator:
 
     def __init__(self,
                  dataframe,
-                 inputs_columns,
-                 outputs_columns=None,
+                 input_columns,
+                 output_columns=None,
                  weight_column=None,
                  output_modes=None,
                  input_image_sizes=(255, 255),
@@ -90,11 +90,11 @@ class DataFrameIterator:
 
         # Arguments:
             dataframe: Pandas dataframe instance.
-            inputs_columns: String or list of strings. If string, the column name
+            input_columns: String or list of strings. If string, the column name
                 containing the absolute paths to the images. If list of strings,
                 the column names that contain the absolute paths to the images
                 for a multi-input architecture.
-            outputs_columns: None, string or list of strings specifying the column
+            output_columns: None, string or list of strings specifying the column
                 or columns that contain the output or outputs information, for
                 a single output or multi-output architecture respectively.
                 If None, no output is returned which is useful to use in
@@ -364,12 +364,12 @@ df_iter = DataFrameIterator(
 - Current: transformations are embedded directly into the `Iterator` base class and the `DataFrameIterator` class.
 - Proposal: a module `data_transformations.py` which handles the logic. Which has almost all private methods except for a functions `transform_output` and `transform_batch`. `transform_output` applies the logic necessary to obtain the information to create a batch (applied in `DataFrameIterator`). `transform_batch` has the logic to actually create the batch (applied in `Iterator`).
 
+
 #### DataFrameIterator and Iterator
 
-- The logic should be change to use the `transform_output` and `transform_batch`.
-- There shuold be a loop or similar that accumullates the batches from each input or output.
-- Data agumentation should be replicated within the create of a batch for any input or output of image type.
-
+- The logic should be changed to use the `transform_output` and `transform_batch`.
+- There should be a loop or similar that accumullates the batches from each input or output.
+- Data agumentation should be replicated within the creation of a batch for any input or output of image type.
 
 ### Impact
 
@@ -378,12 +378,11 @@ df_iter = DataFrameIterator(
 - Dependencies should stay the same.
 - It won't be backwards compatible at all. A plan to communicate the change needs to be carefully thought with incremental steps: announcement, deprecation warning, change to new API.
 
-
 ## Questions and Discussion Topics
 
 - Should I use names of classes and methods based the current API or based on [20190729-keras-preprocessing-redesign.md](https://github.com/keras-team/governance/blob/master/rfcs/20190729-keras-preprocessing-redesign.md)? I currently base it on the current API.
 
-- Do we need to think about images using separate data augmentation logics, in the case of multi-input or multi-output? I think this is a stretch for this RFC, for this to be possible we need `DataFrameIterator` to be the entry point from the user and no `ImageDataGenerator`.
+- Do we need to think about images using separate data augmentation logics, in the case of multi-input or multi-output? I think this is a stretch for this RFC.
 
 - Do we want the `data_transformations.py` array/tensor transformations to be already done in `tensorflow` land or `numpy` land?
 
