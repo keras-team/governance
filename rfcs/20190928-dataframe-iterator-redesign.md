@@ -7,7 +7,7 @@
 
 ## Objective
 
-Change the design of `DataFrameIterator` class to be more intuitive and flexible such that the `flow_from_dataframe` if `ImageDataGenerator` method handles:
+Change the design of the `DataFrameIterator` class to be more intuitive and flexible such that the `flow_from_dataframe` method of the `ImageDataGenerator` class handles:
 
 - regression,
 - binary classification,
