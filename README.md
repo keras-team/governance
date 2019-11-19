@@ -36,7 +36,7 @@ Key stakeholders:
 - Martin Wicke, Google (wicke@google.com)
 - Stan Bileschi, Google (bileschi@google.com)
 - Paige Bailey, Google (webpaige@google.com)
-- Adam Gibson, Skymind (adam@skymind.io)
+- Adam Gibson, Konduit (adam@konduit.ai)
 - Sandeep, Amazon & Keras-MXNet (sandeep.krishna98@gmail.com)
 - JJ Allaire, RStudio (jj@rstudio.com)
 
