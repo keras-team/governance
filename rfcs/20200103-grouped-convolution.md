@@ -55,7 +55,7 @@ Since TensorFlow has native support for group convolutions, there are no changes
 
 ### Is it justified to become part of the core API?
 
-I think the amount of issues asking for this feature justifies an addition to the core API. The addition is also easy to maintain since it does not require large changes to the code base, but your mileage might vary. An alternative would be to add support for it to [TensorFlow Addons](https://github.com/tensorflow/addons), but this would introduce a substantial amount of code duplication between the repositories.
+The amount of issues asking for this feature might justify an addition to the core API. An alternative would be to add support for it to [TensorFlow Addons](https://github.com/tensorflow/addons). Since this is an addition do an existing layer that is supported by many other frameworks and not a new layer type I propose to bypass TensorFlow Addons in this case.
 
 ### Grouped Convolutions on CPU
 
