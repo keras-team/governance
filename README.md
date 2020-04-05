@@ -12,9 +12,7 @@ public design review meetings, and a comittee that reviews the proposals and mak
 The SIG covers all aspects of the Keras API, in particular:
 
 - Design of the core Keras API specification (including its implementations in `tf.keras` and `keras-team/keras`).
-- Design of TensorFlow-specific Keras features to be included in `tf.keras`.
-- Design of the Keras model file format.
-- Design of the API of the subprojects Keras Applications and Keras Preprocessing, which are shared across `tf.keras` and `keras-team/keras`.
+- Design of the Keras-related file formats.
 - Design of the API of all Keras-brand projects, such as AutoKeras and Keras-Tuner.
 
 ## Leadership
@@ -37,7 +35,6 @@ Key stakeholders:
 - Stan Bileschi, Google (bileschi@google.com)
 - Paige Bailey, Google (webpaige@google.com)
 - Adam Gibson, Konduit (adam@konduit.ai)
-- Sandeep, Amazon & Keras-MXNet (sandeep.krishna98@gmail.com)
 - JJ Allaire, RStudio (jj@rstudio.com)
 
 Core Keras community contributors:
@@ -49,7 +46,7 @@ Core Keras community contributors:
 
 ## Design review process
 
-The Keras SIG meets once a month (first Friday of the month at 11am PT) to discuss current development directions.
+The Keras SIG meets on a bimonthly schedule to discuss current development directions.
 This is a public meeting open to anyone who is interested: the [agenda and notes are public](http://bit.ly/keras-meeting-notes). To get notifications and a calendar invitation to the public meeting, please join the [keras-meetings Google Group](https://groups.google.com/a/tensorflow.org/forum/#!forum/keras-meetings).
 
 Other communications are expected to happen primarily asynchronously via:
@@ -90,6 +87,7 @@ We believe that we will only fully realize the potential of machine learning if 
 Our mission is to make these capabilities available to anyone with basic computer literacy, for free. This is how we maximize the realized potential of these technologies, and how we maximize our positive impact on the world.
 
 
+<<<<<<< Updated upstream
 ## Our milestones
 
 As of Q1 2019, 320,000 developers worldwide are using the Keras API to build intelligent applications or conduct research (about 1 developer in 60 globally). Meanwhile, about 1,000,000 developers using machine learning in some form (about 1 developer in 20 globally).
@@ -102,6 +100,8 @@ In everything we do, we should keep in mind the next million developers and the 
 
 In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone. All activity connected with this SIG will abide by the [Code of Conduct](https://github.com/tensorflow/tensorflow/blob/master/CODE_OF_CONDUCT.md).
 
+=======
+>>>>>>> Stashed changes
 ## Our values and our strengths
 
 We will be able to reach our milestones because we yield superpowers of a kind that is quite uncommon among developers of ML tools:
