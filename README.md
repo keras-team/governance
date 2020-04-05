@@ -2,6 +2,7 @@
 
 ![Keras logo](https://s3.amazonaws.com/keras.io/img/keras-logo-2018-large-1200.png)
 
+---
 
 ## Scope of the Keras SIG
 
@@ -14,6 +15,8 @@ The SIG covers all aspects of the Keras API, in particular:
 - Design of the core Keras API specification (including its implementations in `tf.keras` and `keras-team/keras`).
 - Design of the Keras-related file formats.
 - Design of the API of all Keras-brand projects, such as AutoKeras and Keras-Tuner.
+
+---
 
 ## Leadership
 
@@ -43,6 +46,7 @@ Core Keras community contributors:
 - Frederic Branchaud-Charron (Frederic.Branchaud-Charron@usherbrooke.ca)
 - Taehoon Lee (me@taehoonlee.com)
 
+---
 
 ## Design review process
 
@@ -73,6 +77,7 @@ Note that:
 - Participation in design review meetings is restricted to Keras SIG chairs.
 - Design review meeting notes will be posted publicly after each meeting.
 
+---
 
 ## Our mission
 
@@ -86,22 +91,14 @@ We believe that we will only fully realize the potential of machine learning if 
 
 Our mission is to make these capabilities available to anyone with basic computer literacy, for free. This is how we maximize the realized potential of these technologies, and how we maximize our positive impact on the world.
 
-
-<<<<<<< Updated upstream
-## Our milestones
-
-As of Q1 2019, 320,000 developers worldwide are using the Keras API to build intelligent applications or conduct research (about 1 developer in 60 globally). Meanwhile, about 1,000,000 developers using machine learning in some form (about 1 developer in 20 globally).
-
-The size of the Keras user base should rise to 500,000 by Q1 2020, and to 1,000,000 by Q1 2022. In the long term (2025 and beyond), about one developer in ten will be using Keras.
-
-In everything we do, we should keep in mind the next million developers and the next million problems we are empowering them to solve.
+---
 
 ## Code of conduct
 
 In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone. All activity connected with this SIG will abide by the [Code of Conduct](https://github.com/tensorflow/tensorflow/blob/master/CODE_OF_CONDUCT.md).
 
-=======
->>>>>>> Stashed changes
+---
+
 ## Our values and our strengths
 
 We will be able to reach our milestones because we yield superpowers of a kind that is quite uncommon among developers of ML tools:
