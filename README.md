@@ -22,7 +22,7 @@ The SIG covers all aspects of the Keras API, in particular:
 
 ### BDFL
 
-Role: final call in decisions related to the Keras API. Must approve all changes to the Keras API.
+Role: final call in decisions related to the Keras API.
 
 - Francois Chollet (fchollet@google.com)
 
@@ -88,7 +88,7 @@ We seek to empower as many people as possible, from a wide diversity of backgrou
 Existing machine learning technology has the potential to solve a huge amount of problems in the world today, across every industry, and to help a tremendous amount of people.
 The potential is sky-high. We've barely even started. So how do we fully realize this potential?
 
-We believe that we will only fully realize the potential of machine learning if it becomes a tool in everyone's hands -- not just a technology developed behind closed doors by an "AI industry" in Silicon Valley, that you could only deploy by waiting for a turnkey cloud API to become available commercially, or by contracting an expensive consulting firm. We can't wait for experts to solve every problem -- experts in Silicon Valley don't even have visibility into 1% of the problems that can be solved. The end users should solve their own problems. And our mission is to empower them to do just that.
+We believe that we will only fully realize the potential of machine learning if it becomes a tool in everyone's hands -- not just a technology developed behind closed doors by an "AI industry", that you could only deploy by waiting for a turnkey cloud API to become available commercially, or by contracting an expensive consulting firm. We can't wait for experts to solve every problem -- experts at large tech companies don't even have visibility into a tiny fraction of the problems that can be solved. End users should solve their own problems. And our mission is to empower them to do just that.
 
 Our mission is to make these capabilities available to anyone with basic computer literacy, for free. This is how we maximize the realized potential of these technologies, and how we maximize our positive impact on the world.
 
@@ -115,13 +115,13 @@ We will be able to reach our milestones because we yield superpowers of a kind t
 Having empathy for our users means:
 
 - Being users ourselves -- actively using our product in similar scenarios as what our users face.
-- Understand our users by being closely in touch with them and having clear visibility into the developer experience: actively seeking community input in everything we do, listening to feedback, talking with users at external talks and developer events.
+- Understanding our users by being closely in touch with them and having clear visibility into the developer experience: actively seeking community input in everything we do, listening to feedback, talking with users at external talks and developer events.
 - Putting ourselves in our users' shoes: always going above and beyond to be helpful to our users and to improve the user experience of our products.
 
 **2) We value good design.** We are fully aware that a delightful UX is what has made us successful so far and what will keep making us successful in the future. We know that things should be as simple as possible (but no simpler). We prefer elegance and minimalism over technical prowess. We follow formal principles for good design.
 
-**3) We embrace openness and we are dedicated to foster our developer community.** We know that long-term community building is critical to the success of our project, and we know that developer communities don't get built behind closed doors at Google. We understand the necessity of doing our work in the open and the importance of involving open-source contributors at all stages of the development process.
+**3) We embrace openness and we are dedicated to foster our developer community.** We know that long-term community building is critical to the success of our project, and we know that developer communities don't get built behind closed doors. We understand the necessity of doing our work in the open and the importance of involving open-source contributors at all stages of the development process.
 
-**4) We value and practice good communication.** We understand that great documentation, great code examples, and transparency of governance are essential to Keras adoption and contribute hugely to the Keras UX. We value external communication, documentation, and developers relations as much or more than we value technical contributions.
+**4) We value and practice good communication.** We understand that great documentation, great code examples, and transparency of governance are essential to Keras adoption and contribute meaningfully to the Keras UX. We value external communication, documentation, and developers relations as much as we value technical contributions.
 
-**5) We value what makes us different and unique, and we value our brand that users love, Keras.** The Keras brand is an essential tool in reaching our goals: it stands for user-friendliness, accessibility, and good design, in a way that doesn't ring true for our allies and our foes. We are proud of our banner and we will carry it forward.
+**5) We value what makes us different and unique, and we value our brand that users love, Keras.** The Keras brand is an essential tool in reaching our goals: it stands for user-friendliness, accessibility, and good design. We are proud of our banner and we will carry it forward.
