@@ -71,6 +71,7 @@ The process for writing and submitting design proposals is same as the [TensorFl
 - The proposal will finally be approved or rejected during a meeting of the Keras SIG chairs. Once approved, you can send out Pull Requests to implement the API changes or ask others to write Pull Requests (targeting `tf.keras` and `keras-team/keras`).
 
 Note that:
+
 - Anyone is free to send out API proposals.
 - Anyone is free to comment on API proposals or ask questions.
 - Anyone is free to attend design review meetings as an observer.
@@ -112,6 +113,7 @@ We will be able to reach our milestones because we yield superpowers of a kind t
 **1) We have empathy for our users.** We know that every decision we make should be made with the user in mind, whether a design decision or a strategy decision. "What will be the total impact of our choices on the people who rely on our software?" is the question behind everything we do.
 
 Having empathy for our users means:
+
 - Being users ourselves -- actively using our product in similar scenarios as what our users face.
 - Understand our users by being closely in touch with them and having clear visibility into the developer experience: actively seeking community input in everything we do, listening to feedback, talking with users at external talks and developer events.
 - Putting ourselves in our users' shoes: always going above and beyond to be helpful to our users and to improve the user experience of our products.
