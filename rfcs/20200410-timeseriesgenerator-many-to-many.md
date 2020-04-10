@@ -24,7 +24,7 @@ where the user models nonlinear dynamical systems based on input and output time
 Those models usually modeled as state-space systems where the next system state **s** 
 is modelled as a function of current state and the current input vector **u**:
 
-![ss](./assets/20190502-preprocessing-layers-ss.png)
+![ss](assets/20190502-preprocessing-layers-ss.png)
 
 The recurrent part `f_theta` calculates the next state (green blocks) given inputs (red), 
 the stateless part `g_omega` calculates the output (blue). 
