@@ -29,6 +29,8 @@ is modelled as a function of current state and the current input vector **u**:
 The recurrent part `f_theta` calculates the next state (green blocks) given inputs (red), 
 the stateless part `g_omega` calculates the output (blue). 
 
+See [here](https://www.cs.toronto.edu/~tingwuwang/rnn_tutorial.pdf) for details.
+
 In order to train those systems the model has to be fed like in many-to-many scenario above (5). 
 Users have to write custom code to prepare their datasets which can be done with 
 `TimeseriesGenerator` in a more generic and "common" way.
