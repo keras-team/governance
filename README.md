@@ -45,6 +45,7 @@ Core Keras community contributors:
 - Fariz Rahman (farizrahman4u@gmail.com)
 - Frederic Branchaud-Charron (Frederic.Branchaud-Charron@usherbrooke.ca)
 - Taehoon Lee (me@taehoonlee.com)
+- Gabriel de Marmiesse (gabrieldemarmiesse@gmail.com)
 
 ---
 
