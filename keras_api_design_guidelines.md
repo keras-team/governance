@@ -10,7 +10,7 @@ Some text remixed from external references:
 - [[2]](https://medium.com/s/story/notes-to-myself-on-software-engineering-c890f16f4e4d)
 
 
---
+---
 
 ## Design end-to-end workflows, not individual functions and classes.
 
@@ -22,7 +22,7 @@ When developing APIs, start by designing end-to-end workflows, and only sketch o
 - This implies that we will often ask the question: **do users really need to configure this parameter?**, and in many cases, the answer will be “no”, rather than being “yes” by default.
 
 
---
+---
 
 ## Carefully weigh whether a new feature should be included.
 
@@ -47,7 +47,7 @@ In addition, when saying yes to a request for supporting a new use case, remembe
 - We should not move to core an API that has debuted somewhere on GitHub or TF-Addons but has failed to gain more than a few users after a few months.
 
 
---
+---
 
 ## Seek to minimize cognitive load for our users.
 
@@ -119,7 +119,7 @@ What's nice about this?
 - Plain Python types.
 
 
---
+---
 
 ## Balance expressivity vs. user-friendliness.
 
@@ -142,7 +142,7 @@ For instance, layers that create weights should not be cast as functions, since 
 For instance, the optimizer API or the layers API should not contain arguments for configuring distributed training. That should go into the distribution API.
 
 
---
+---
 
 ## Don’t neglect error messages, docstrings, and documentation.
 
@@ -211,10 +211,10 @@ ValueError: '''You are passing a target array of shape (600, 1) while using as l
 `categorical_crossentropy` expects targets to be binary matrices (1s and 0s) of shape (samples, classes).
 If your targets are integer classes, you can convert them to the expected format via:
 
---
+---
 from keras.utils import to_categorical
 y_binary = to_categorical(y_int)
---
+---
 
 Alternatively, you can use the loss function `sparse_categorical_crossentropy` instead, which does expect integer targets.
 ```
