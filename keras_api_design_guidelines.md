@@ -6,8 +6,8 @@ These are meant as guidelines, not rules: each decision should be debated in its
 
 Some text remixed from external references:
 
-- [[1]](https://blog.keras.io/user-experience-design-for-apis.html)
-- [[2]](https://medium.com/s/story/notes-to-myself-on-software-engineering-c890f16f4e4d)
+- [User experience design for APIs](https://blog.keras.io/user-experience-design-for-apis.html)
+- [Notes to Myself on Software Engineering](https://medium.com/s/story/notes-to-myself-on-software-engineering-c890f16f4e4d)
 
 
 ---
