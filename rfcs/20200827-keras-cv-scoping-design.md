@@ -8,27 +8,37 @@
 
 ## Objective
 
-We aim at describing the scope of [keras-cv](https://github.com/keras-team/keras-cv), especially:
-- What areas should keras-cv include
-- Boundaries between keras-cv and [tensorflow addons](https://github.com/tensorflow/addons)
-- Boundaries between keras-cv and [tensorflow model garden](https://github.com/tensorflow/models)
-- Boundaries between keras-cv and [tf.keras.applications](https://www.tensorflow.org/api_docs/python/tf/keras/applications).
+This document describes the scope of the [keras-cv](https://github.com/keras-team/keras-cv) package, especially:
+- What use cases `keras-cv` should cover
+- Boundaries between `keras-cv` and [TensorFlow Addons](https://github.com/tensorflow/addons)
+- Boundaries between `keras-cv` and [TensorFlow model garden](https://github.com/tensorflow/models)
+- Boundaries between `keras-cv` and [tf.keras.applications](https://keras.io/api/applications/)
 
 ## Motivation
 
-Computer vision (cv) has been an essential component in many machine learning solutions. Keras has been widely
-used in many image classification tasks. However, a Keras-native modeling solutions for more advanced tasks,
-such as object detection, instance segmentation, etc., is still lacking. 
+Computer vision (CV) is a major application area for our users.
+Keras on its own provides good support for image classification tasks, in particular via `tf.keras.applications`.
+However, a Keras-native modeling solutions for more advanced tasks,
+such as object detection, instance segmentation, etc., is still lacking.
 
-## User Benefit
+As a result, the open-source community has rolled out many different solutions for these use cases,
+made available via PyPI and GitHub. These third-party solutions are not always kept up to date, and
+many still rely on the legacy multi-backend Keras. They also raise the issue of API standardization.
 
-We hope to help machine learning engineers benefit from re-using Keras native, optimized, and well-tested
-components to build their models. We hope to help research scientists benefit from subclassing and re-composing
-Keras primitive components to test new research ideas. 
+To fix this, we want machine learning engineers to have access to a standard Keras-native,
+optimized, and well-tested set of components to build their advanced computer vision models.
+
+This provides key user benefits:
+
+- The package would be first-party and thus always up to date with modern best practices.
+- High code quality and testing standards and strict quality control: same level of trust as core Keras
+- A shared API standard across the community
+- Ability for the open-source community to build more advanced solutions *on top* of this package instead of reinventing it
 
 ## Design Proposal
 
-We propose keras-cv to provide components that cover the following areas:
+`keras-cv` will provide components that cover the following areas:
+
 - Object Detection tasks.
 - Instance Segmentation tasks.
 - Semantic Segmentation tasks.
@@ -36,52 +46,70 @@ We propose keras-cv to provide components that cover the following areas:
 - Video Classification tasks.
 - Object Tracking tasks.
 
-Specifically, for Object Detection tasks, we propose keras-cv to include most anchor-based modules:
+Specifically, for Object Detection tasks, `keras-cv` will include most anchor-based modules:
+
 - Common objects such as anchor generator, box matcher.
 - Keras layer components such as ROI generator, NMS postprocessor.
 - Keras backbone components that fills the gap from keras-applications.
 - Keras losses and metrics, such as Focal loss and coco metrics.
 - Data loader and preprocessing for different dataset, such as COCO.
 
-For Semantic Segmentation tasks, we propose keras-cv to include:
-- Keras head components such as Atrous Spetial Pyramid Pooling (ASPP).
+For Semantic Segmentation tasks, `keras-cv` will include:
 
-Criteria for keras-cv:
-- Widely accepted building components that serve various modeling tasks.
-- Tasks that improves model training.
-- Operations that will work in CPU/GPU/TPU.
+- Keras head components such as Atrous Spatial Pyramid Pooling (ASPP).
 
-Boundaries between keras-cv and keras-applications:
+## Success criteria for `keras-cv`
+
+- Cover all modeling tasks listed above
+- Easy-to-use API
+- Models run on CPU/GPU/TPU seamlessly
+- State of the art performance
+- Models can be readily deployed to production
+
+## Boundaries between keras-cv and keras-applications
+
 - keras-applications will be improved to include basic building blocks such as mobilenet bottleneck, that
  include feature maps
 - keras-cv will depend on keras-applications for importing backbones.
 
-Boundaries between keras-cv and Tensorflow Addons:
+## Boundaries between keras-cv and Tensorflow Addons
+
 - Highly experimental modeling, layers, losses, etc, live in addons.
 - Components from addons will graduate to Model Garden, given it incurs more usage,
  and it works in CPU/GPU/TPU. The API interface will remain experimental after graduation.
 
-Boundaries between keras-cv and Model Garden:
+## Boundaries between keras-cv and Model Garden
+
 - End to end modeling workflow and model specific details live in Model Garden
 - Model garden will re-use most of the building blocks from keras-cv
 - Components from Model Garden can graduate to keras-cv, given it is widely accepted, 
  it works performant in CPU/GPU/TPU. The API interface should remain stable after graduation.
 
-Dependencies:
-- Tensorflow version >= 2.4.
-- Tensorflow datasets.
+## Dependencies
+
+- Tensorflow version >= 2.4
+- Tensorflow datasets
 - Keras-applications
 
-Backwards compatibility:
+## Backwards compatibility
+
 We propose to guarantee major release backwards compatibility.
 
-Maintenance:
-This repository will be maintained by Keras team.
+## Maintenance & development process
 
-Performance Benchmark:
-We will set-up Keras benchmark utilities to help users contribute to this repository.
+The `keras-cv` codebase will be primarily maintained by the Keras team at Google,
+with help and contributions from the community. The codebase will be developed
+on GitHub as part of the `keras-team` organization. The same process for tracking
+issues and reviewing PRs will be used as for the core Keras repository.
+
+## Performance benchmark
+
+We will set up Keras benchmark utilities to help users contribute to this repository.
 
 ## Detailed Design
-Detailed design will be separate from scoping.
+
+Detailed design will be shared in a separate document (this document only focuses on scope).
 
 ## Questions and Discussion Topics
+
+Please share any questions or suggestion.
