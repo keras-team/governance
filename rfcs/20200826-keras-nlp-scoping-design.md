@@ -2,78 +2,107 @@
 
 | Status        | Proposed      |
 :-------------- |:---------------------------------------------------- |
-| **Author(s)** | Zhenyu Tan (tanzheny@google.com), Mark Momernick (momernick@google.com), Francois Chollet (fchollet@google.com) |
+| **Author(s)** | Zhenyu Tan (tanzheny@google.com), Mark Omernick (momernick@google.com), Francois Chollet (fchollet@google.com) |
 | **Updated**   | 2020-08-26                                           |
 
 
 ## Objective
 
 We aim at describing the scope of [keras-nlp](https://github.com/keras-team/keras-nlp), especially:
-- What keras-nlp should include
-- Boundaries between keras-nlp and [tensorflow addons](https://github.com/tensorflow/addons)
-- Boundaries between keras-nlp and [tensorflow model garden](https://github.com/tensorflow/models)
-- Boundaries between keras-nlp and [tf.keras](https://www.tensorflow.org/api_docs/python/tf/keras).
-- Boundaries between keras-nlp and [tf.text](https://www.tensorflow.org/tutorials/tensorflow_text/intro).
+
+- What use cases `keras-nlp` should cover
+- Boundaries between `keras-nlp` and [tensorflow addons](https://github.com/tensorflow/addons)
+- Boundaries between `keras-nlp` and [tensorflow model garden](https://github.com/tensorflow/models)
+- Boundaries between `keras-nlp` and [tf.keras](https://www.tensorflow.org/api_docs/python/tf/keras).
+- Boundaries between `keras-nlp` and [tf.text](https://www.tensorflow.org/tutorials/tensorflow_text/intro).
 
 ## Motivation
 
-Natural language processing (nlp) has become an essential component in many machine learning solutions.
-However, a Keras-native modeling solution is still lacking for TF2.
+Natural Language Processing (NLP) is a major application area for our users.
+In recent years, Transformer-based models have become the foundation of many NLP workflows.
+These workflows tend to reuse similar components, for which in some cases third-party packages
+have been developed by the open-source community.
 
-## User Benefit
+These third-party solutions are not always kept up to date or up to the same quality standards as core Keras.
+They also raise the issue of API standardization.
 
-We hope to help machine learning engineer benefit from re-using Keras native, optimized, and well-tested
-components to build their models. We hope to help research scientists benefit from subclassing and re-composing
-Keras primitive components to test new research ideas. 
+To fix this, we want machine learning engineers to have access to a standard Keras-native,
+optimized, and well-tested set of components to build their Transformer-based (and beyond) NLP workflows.
+
+This provides key user benefits:
+
+- The package would be first-party and thus always up to date with modern best practices.
+- High code quality and testing standards and strict quality control: same level of trust as core Keras
+- A shared API standard across the community
+- Ability for the open-source community to build more advanced solutions *on top* of this package instead of reinventing it
+- Ability for research scientists to benefit from subclassing and customizing base components to quickly test new research ideas
 
 ## Design Proposal
 
-We propose keras-nlp to include most transformer-based modules, specifically:
+`keras-nlp` will include most standard Transformer-based modules, specifically:
+
 - Keras layer components such as Transformer encoder and decoder blocks.
 - Keras task components such as masked language, span labeler and named entity recognition.
 - Tensorflow operations such as beam search.
 - Keras optimizer utilities such as learning rate schedules widely used.
 - Data loader and preprocessing for different dataset, such as SQUAD, GLUE.
 
-Criteria for keras-nlp:
-- Widely accepted building components that serve various modeling tasks.
-- Tasks that improves model training.
-- Operations that will work in CPU/GPU/TPU.
+## Success criteria for keras-nlp
 
-Boundaries between keras-nlp and TF.Text:
-- TF.Text will contain all pre-processing operations, such as WordPiece Tokenizer, n-grams, that handles strings.
-- keras-nlp will contain components after tokenization.
+- Reusable and standardized components that cover the above
+- Easy-to-use API
+- Models run on CPU/GPU/TPU seamlessly
+- State of the art performance
+- Models can be readily deployed to production
 
-Boundaries between keras-nlp and Tensorflow Addons:
-- Highly experimental modeling, layers, losses, etc, live in addons.
-- Components from addons will graduate to Model Garden, given it incurs more usage,
- and it works in CPU/GPU/TPU. The API interface will remain experimental after graduation.
+## Boundaries between keras-nlp and tf.text
 
-Boundaries between keras-nlp and Model Garden:
+- `tf.text` will contain all pre-processing operations, such as WordPiece Tokenizer, n-grams, that handles strings.
+- `keras-nlp` will contain modeling components that cover workflows past the tokenization stage.
+
+## Boundaries between `keras-nlp` and TensorFlow Addons:
+
+- Highly experimental modeling, layers, losses, etc, live in Addons (e.g. newly published research code).
+- Components from Addons will graduate to Model Garden, given they get sufficient usage,
+and given that they work on CPU/GPU/TPU. The API interface will remain experimental for a short time after graduation,
+so as to leave us the option to make changes based on user feedback.
+
+## Boundaries between keras-nlp and Model Garden
+
 - End to end modeling workflow and model specific details live in Model Garden
 - Model garden will re-use most of the building blocks from keras-nlp
-- Components from Model Garden can graduate to keras-nlp, given it is widely accepted, 
- it works performant in CPU/GPU/TPU. The API interface should remain stable after graduation.
+- Components from Model Garden can graduate to keras-nlp, given they get sufficient usage,
+and given that they work on CPU/GPU/TPU. The API interface should remain stable after graduation.
 
-Boundaries between keras-nlp and Keras:
-- keras-nlp will contain language specific components.
+# Boundaries between keras-nlp and core Keras
+
+- `keras-nlp` will contain NLP-specific components
+(e.g. the `MultiHeadAttention` layer may be used outside of NLP, and thus is shipping in core Keras).
 - Components from keras-nlp can graduate to Keras core, given its usage expands beyond
- natural language processing. One example is `tf.keras.layers.MultiHeadAttention`
+ natural language processing.
 
-Dependencies:
-- Tensorflow version >= 2.4.
-- Tensorflow datasets.
+## Dependencies
 
-Backwards compatibility:
+- Tensorflow version >= 2.4
+- Tensorflow datasets
+
+## Backwards compatibility
+
 We propose to guarantee major release backwards compatibility.
 
-Maintenance:
-This repository will be maintained by Keras team.
+## Maintenance
 
-Performance Benchmark:
-We will set-up Keras benchmark utilities to help users contribute to this repository.
+The `keras-nlp` codebase will be primarily maintained by the Keras team at Google,
+with help and contributions from the community. The codebase will be developed
+on GitHub as part of the `keras-team` organization. The same process for tracking
+issues and reviewing PRs will be used as for the core Keras repository.
 
-## Detailed Design
-Detailed design will be separate from scoping.
+## Performance Benchmark
+
+We will set up Keras benchmark utilities to help users contribute to this repository.
+
+Detailed design will be shared in a separate document (this document only focuses on scope).
 
 ## Questions and Discussion Topics
+
+Please share any questions or suggestion.
