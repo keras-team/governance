@@ -2,8 +2,8 @@
 
 | Status        | Proposed      |
 :-------------- |:---------------------------------------------------- |
-| **Author(s)** | Zhenyu Tan (tanzheny@google.com), Mark Omernick (momernick@google.com), Francois Chollet (fchollet@google.com) |
-| **Updated**   | 2020-08-26                                           |
+| **Author(s)** | Zhenyu Tan (tanzheny@google.com), Mark Omernick (momernick@google.com), Francois Chollet (fchollet@google.com), Hongkun Yu (hongkuny@google.com)|
+| **Updated**   | 2020-09-11                                           |
 
 
 ## Objective
@@ -47,7 +47,7 @@ This provides key user benefits:
 - Keras optimizer utilities such as learning rate schedules widely used.
 - Data loader and preprocessing for different dataset, such as SQUAD, GLUE.
 
-## Success criteria for keras-nlp
+### Success criteria for keras-nlp
 
 - Reusable and standardized components that cover the above
 - Easy-to-use API
@@ -55,26 +55,26 @@ This provides key user benefits:
 - State of the art performance
 - Models can be readily deployed to production
 
-## Boundaries between keras-nlp and tf.text
+### Boundaries between keras-nlp and tf.text
 
 - `tf.text` will contain all pre-processing operations, such as WordPiece Tokenizer, n-grams, that handles strings.
 - `keras-nlp` will contain modeling components that cover workflows past the tokenization stage.
 
-## Boundaries between `keras-nlp` and TensorFlow Addons:
+### Boundaries between `keras-nlp` and TensorFlow Addons:
 
 - Highly experimental modeling, layers, losses, etc, live in Addons (e.g. newly published research code).
 - Components from Addons will graduate to Model Garden, given they get sufficient usage,
 and given that they work on CPU/GPU/TPU. The API interface will remain experimental for a short time after graduation,
 so as to leave us the option to make changes based on user feedback.
 
-## Boundaries between keras-nlp and Model Garden
+### Boundaries between keras-nlp and Model Garden
 
 - End to end modeling workflow and model specific details live in Model Garden
 - Model garden will re-use most of the building blocks from keras-nlp
 - Components from Model Garden can graduate to keras-nlp, given they get sufficient usage,
 and given that they work on CPU/GPU/TPU. The API interface should remain stable after graduation.
 
-# Boundaries between keras-nlp and core Keras
+### Boundaries between keras-nlp and core Keras
 
 - `keras-nlp` will contain NLP-specific components
 (e.g. the `MultiHeadAttention` layer may be used outside of NLP, and thus is shipping in core Keras).
