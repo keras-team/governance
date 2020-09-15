@@ -75,13 +75,13 @@ For Semantic Segmentation tasks, `keras-cv` will include:
 ## Boundaries between keras-cv and Tensorflow Addons
 
 - Highly experimental modeling, layers, losses, etc, live in addons.
-- Components from addons will graduate to Model Garden, given it incurs more usage,
+- Components from addons will graduate to keras-cv, given it incurs more usage,
  and it works in CPU/GPU/TPU. The API interface will remain experimental after graduation.
 
 ## Boundaries between keras-cv and Model Garden
 
 - End to end modeling workflow and model specific details live in Model Garden
-- Model garden will re-use most of the building blocks from keras-cv
+- Model garden will re-use most of the building blocks from keras-cv and Tensorflow Addons.
 - Components from Model Garden can graduate to keras-cv, given it is widely accepted, 
  it works performant in CPU/GPU/TPU. The API interface should remain stable after graduation.
 
