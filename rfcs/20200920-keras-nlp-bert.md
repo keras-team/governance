@@ -2,15 +2,14 @@
 
 | Status        | Proposed      |
 :-------------- |:---------------------------------------------------- |
-| **Author(s)** | Zhenyu Tan (tanzheny@google.com), Francois Chollet (fchollet@google.com), Mark Omernick (momernick@google.com), Hongkun Yu (hongkuny@google.com)|
+| **Author(s)** | Zhenyu Tan (tanzheny@google.com), Francois Chollet (fchollet@google.com), Hongkun Yu (hongkuny@google.com)|
+| **Sponsor(s)** | Mark Omernick (momernick@google.com)|
 | **Updated**   | 2020-09-21                                           |
 
 
 ## Objective
 
 We aim at providing a set of primitive Keras layers to handle Transformer Encoder based, BERT-style models.
-
-Tokenization is not part of thi 
 
 ## Key Benefits
 
