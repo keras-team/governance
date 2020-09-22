@@ -9,26 +9,28 @@
 
 ## Objective
 
-We aim at providing a set of primitive Keras layers to handle Transformer Encoder based, BERT-style models.
+We aim at providing a set of Keras layers to handle Transformer-Encoder BERT-style models.
 
 ## Key Benefits
 
-BERT-style transformer encoders has been state-of-art technique that enpowers many NLP tasks:
-- single sentence classification task, e.g., sentiment analysis
-- sentence pair classification task, e.g., next sentence prediction
-- question answering task, e.g., SQuAD
-- single sentence tagging task, e.g., named entity recognition
+BERT-style Transformer-Encoders are a state-of-art technique that powers many NLP tasks:
 
-With this proposal, users of will be able to model above language tasks with much simplified API. 
+- Single sentence classification task, e.g., sentiment analysis
+- Sentence pair classification task, e.g., next sentence prediction
+- Question answering task, e.g., SQuAD
+- Single sentence tagging task, e.g., named entity recognition
+
+With this proposal, Keras users will be able to handle the tasks above with a simple API. 
 
 ## Design overview
 
-This proposal builds on the assumption that inputs are lookup indices, i.e., tf.int64. Tokenization is not part of this
-proposal but will be our immediate next step.
+This proposal builds on the assumption that inputs are lookup indices, i.e., `tf.int64` sequences.
+Tokenization is not part of this proposal but will be our immediate next step.
 
 ### Classification task
 
 Case where a user want to use a pretrained BERT encoder for sentiment analysis:
+
 ```python
 # Considering a imbd review dataset
 import tensorflow as tf
@@ -81,7 +83,7 @@ model.fit(train_ds, epochs=5, validation_data=test_ds)
 
 ### Pretraining task
 
-We aim to provide SavedModel for BertEncoder, however user can choose to pretrain a new BertEncoder based on their
+We aim to provide pretrained checkpoints for `BertEncoder`, however the user can choose to pretrain a new BertEncoder based on their
 own dataset.
 
 ```python
@@ -103,10 +105,10 @@ model.compile('adam', {'lm_output': 'sparse_categorical_crossentropy', 'cls_outp
 model.fit(train_ds, epochs=100)
 ```
 
-### Other encoder based network
+### Other encoder-based networks
 
-BertEncoder is the first encoder network we propose in this doc. However other encoder networks can be easily
-built on top of Transformer Encoder layer. For example, for a transformer encoder sharing mechanism
+`BertEncoder` is the first encoder network we propose in this doc. However other encoder networks can be easily
+built on top of the `TransformerEncoderBlock` layer. For example, for a transformer encoder sharing mechanism
 with [ALBERT](https://arxiv.org/pdf/1909.11942.pdf), this can be achieved by:
 
 ```python
@@ -138,7 +140,9 @@ model = tf.keras.Model(inputs=[word_ids, mask, type_ids], outputs=outputs)
 ## Detailed Design
 
 ### Layers -- TransformerEncoderBlock
+
 This layer encapsulates a single layer of Transformer Encoder.
+
 ```python
 class TransformerEncoderBlock(tf.keras.layers.Layer):
   """TransformerEncoderBlock layer.
@@ -210,6 +214,7 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):
 ```
 
 ### Layers -- SelfAttentionMask
+
 ```python
 class SelfAttentionMask(tf.keras.layers.Layer):
   """Create 3D attention mask from a 2D tensor mask.
@@ -226,6 +231,7 @@ class SelfAttentionMask(tf.keras.layers.Layer):
 ```
 
 ### Layers -- OnDeviceEmbedding
+
 ```python
 class OnDeviceEmbedding(tf.keras.layers.Layer):
   """Performs an embedding lookup suitable for accelerator devices.
@@ -257,6 +263,7 @@ class OnDeviceEmbedding(tf.keras.layers.Layer):
 ```
 
 ### Layers -- PositionEmbedding
+
 ```python
 class PositionEmbedding(tf.keras.layers.Layer):
   """Creates a positional embedding.
@@ -273,6 +280,7 @@ class PositionEmbedding(tf.keras.layers.Layer):
 ```
 
 ### Layers -- MaskedLM
+
 ```python
 class MaskedLM(tf.keras.layers.Layer):
   """Masked language model network head for BERT modeling.
@@ -300,6 +308,7 @@ class MaskedLM(tf.keras.layers.Layer):
 ```
 
 ### Encoders -- BertEncoder
+
 ```python
 class BertEncoder(tf.keras.Model):
   """Bi-directional Transformer-based encoder network.
@@ -366,4 +375,5 @@ class BertEncoder(tf.keras.Model):
 ```
 
 ## Questions and Discussion Topics
+
 Gathering feedbacks on arguments & naming conventions.
