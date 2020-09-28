@@ -113,7 +113,7 @@ def serving_fn(image):
   batched_image = tf.expand_dims(image)
   raw_boxes, scores = loaded_model(batched_image, training=False)
   decoded_boxes = box_coder.decode(raw_boxes, anchor_boxes)
-  classes, scores, boxes = detection_generator(scores, decoded_boxes)
+  classes, scores, boxes, _ = detection_generator(scores, decoded_boxes)
   return classes, scores, boxes
 ```
 
@@ -212,11 +212,12 @@ class BoxMatcher:
         representing any similarity metric.
 
     Returns:
-      A integer tensor of shape [N] with corresponding match indices for each
-      of M columns, for positive match, the match result will be the
-      corresponding row index, for negative match, the match will be
-      `negative_value`, for ignored match, the match result will be
-      `ignore_value`.
+      matched_indices: A integer tensor of shape [N] with corresponding match indices for each
+        of M columns, the value represent the column index that argmax match in the matrix.
+      matched_indicators: A integer tensor of shape [N] or [B, N]. For positive match, the match 
+        result will be the `positive_value`, for negative match, the match will be
+        `negative_value`, for ignored match, the match result will be
+        `ignore_value`.
     """
 ```
 
@@ -233,11 +234,11 @@ class IouSimilarity:
       anchors: a float Tensor with M boxes.
 
     Returns:
-      A tensor with shape [M, N] or [batch_size, M, N] representing pairwise
+      A tensor with shape [M, N] or [B, M, N] representing pairwise
         iou scores, anchor per row and groundtruth_box per colulmn.
 
     Input shape:
-      groundtruth_boxes: [N, 4], or [batch_size, N, 4]
+      groundtruth_boxes: [N, 4], or [B, N, 4]
       anchors: [M, 4], or [batch_size, M, 4]
 
     Output shape:
@@ -264,6 +265,8 @@ class AnchorLabeler:
       mask: An integer tensor with shape [N] representing match
         labels, e.g., 1 for positive, -1 for negative, -2 for ignore.
       mask_val: An python primitive to fill in places where mask is True.
+    Returns:
+      targets: A tensor with [M, dim] or [B, M, dim] selected from the `match_indices`.
     """
 ```
 
@@ -297,6 +300,7 @@ class FocalLoss(tf.keras.losses.Loss):
             more details.
       name: Optional name for the op. Defaults to 'retinanet_class_loss'.
     """
+
   def call(self, y_true, y_pred):
     """Invokes the `FocalLoss`.
 
