@@ -103,7 +103,7 @@ model.save(file_path)
 
 Case where a user want to serve the trained model for a single image.
 ```python
-loaded_model = tf.keras.models.load(model)
+loaded_model = tf.keras.models.load(file_path)
 box_coder = keras_cv.ops.BoxCoder(offset='sigmoid')
 anchor_generator = keras_cv.ops.AnchorGenerator()
 anchor_boxes = anchor_generator(image_size)
