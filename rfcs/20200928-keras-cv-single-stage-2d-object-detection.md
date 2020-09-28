@@ -50,7 +50,7 @@ anchor_generator = keras_cv.ops.AnchorGenerator(anchor_sizes, scales, aspect_rat
 similarity_calculator = keras_cv.ops.IOUSimilarity()
 box_matcher = keras_cv.ops.BoxMatcher(positive_threshold, negative_threshold)
 target_gather = keras_cv.ops.TargerGather()
-box_encoder = keras_cv.ops.BoxCoder(offset='sigmoid')
+box_coder = keras_cv.ops.BoxCoder(offset='sigmoid')
 
 def encode_label(image, gt_boxes, gt_labels):
   anchor_boxes = anchor_generator(image_size)
@@ -63,7 +63,7 @@ def encode_label(image, gt_boxes, gt_labels):
 
   class_targets = target_gather(gt_labels, match_indices, class_mask, -1)
   box_targets = target_gather(gt_boxes, match_indices, box_mask, 0.0)
-  box_targets = box_encoder(box_targets, anchor_boxes)
+  box_targets = box_coder.encode(box_targets, anchor_boxes)
 
   weights = tf.squeeze(tf.ones_like(gt_labels), axis=-1)
   ignore_mask = tf.equal(match_indicators, -2)
@@ -104,12 +104,16 @@ model.save(file_path)
 Case where a user want to serve the trained model for a single image.
 ```python
 loaded_model = tf.keras.models.load(model)
+box_coder = keras_cv.ops.BoxCoder(offset='sigmoid')
+anchor_generator = keras_cv.ops.AnchorGenerator()
+anchor_boxes = anchor_generator(image_size)
 detection_generator = keras_cv.layers.NMSDetectionDecoder()
 @tf.function
 def serving_fn(image):
   batched_image = tf.expand_dims(image)
-  results = loaded_model(batched_image, training=False)
-  classes, scores, boxes = detection_generator(results['classification'], results['regression'])
+  raw_boxes, scores = loaded_model(batched_image, training=False)
+  decoded_boxes = box_coder.decode(raw_boxes, anchor_boxes)
+  classes, scores, boxes = detection_generator(scores, decoded_boxes)
   return classes, scores, boxes
 ```
 
