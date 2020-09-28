@@ -8,30 +8,36 @@
 
 ## Objective
 
-We aim at providing the core primitive components for training and serving single stage two-dimensional object
-detection models, such as Single-Shot MultiBox Detector (SSD), RetinaNet, You-Only-Look-Once (YOLO).
+We aim at providing the core primitive components for training and serving single-stage two-dimensional object
+detection models, such as Single-Shot MultiBox Detector (SSD), RetinaNet, and You-Only-Look-Once (YOLO).
 
 ## Key Benefits
 
-Single stage object detection models are a state-of-art technique that powers many computer vision tasks, they provide
-faster detection compared to two stage models (such as FasterRCNN), while maintaining comparable performance.
+Single-stage object detection models are a state-of-art technique that powers many computer vision tasks, they provide
+faster detection compared to two-stage models (such as FasterRCNN), while maintaining comparable performance.
 
-With this proposal, Keras users will be able to build end-to-end models with a much simplified API.
+With this proposal, Keras users will be able to build end-to-end models with a simple API.
 
 ## Design overview
 
-This proposal includes the specific core components for building single stage object detection models. It does not,
-include, however, 1) Data augmentation, such as image and groundtruth box preprocessing, 2) Model backbone, such as
-DarkNet, or functions to generate feature maps 3) Detection heads, such as Feature Pyramid, 4) metrics utils such as
-COCO Evaluator, or visualization utils. Data augmentation will be included as a separate RFC that handles a
+This proposal includes the specific core components for building single-stage object detection models. It does not,
+include, however, include:
+
+1. Data augmentation, such as image and groundtruth box preprocessing
+2. Model backbone, such as DarkNet, or functions to generate feature maps
+3. Detection heads, such as Feature Pyramid
+4. metrics utilities such as COCO Evaluator, or visualization utils.
+
+Data augmentation will be included as a separate RFC that handles a
 broader context than object detection.
 
-Model backbone and detection heads are model specific, we anticipate them to be analyzed and proposed in 
-keras-applications for heavily used patterns, however the user can build them easily using keras.
+Model backbone and detection heads are model-specific, we anticipate them to be analyzed and proposed in 
+`keras.applications` for heavily used patterns, however the user can build them easily using Keras.
 
 #### Training
 
 Case where a user want to train from scratch:
+
 ```python
 import tensorflow as tf
 import tensorflow_datasets as tfds
@@ -49,7 +55,7 @@ def preprocess(features):
 anchor_generator = keras_cv.ops.AnchorGenerator(anchor_sizes, scales, aspect_ratios, strides)
 similarity_calculator = keras_cv.ops.IOUSimilarity()
 box_matcher = keras_cv.ops.BoxMatcher(positive_threshold, negative_threshold)
-target_gather = keras_cv.ops.TargerGather()
+target_gather = keras_cv.ops.TargetGather()
 box_coder = keras_cv.ops.BoxCoder(offset='sigmoid')
 
 def encode_label(image, gt_boxes, gt_labels):
@@ -93,7 +99,9 @@ strategy = tf.distribute.TPUStrategy(...)
 with strategy.scope():
     optimizer = tf.keras.optimizers.SGD(lr_scheduler)
     model = RetinaNet()
-    model.compile(optimizer, {'classification': keras_cv.losses.Focal(), 'regression': tf.keras.losses.Huber()}, [])
+    model.compile(optimizer=optimizer,
+                  loss={'classification': keras_cv.losses.Focal(), 'regression': tf.keras.losses.Huber()},
+                  metrics=[])
 
 model.fit(transformed_train_ds, epochs=120, validation_data=transformed_eval_ds)
 model.save(file_path)
@@ -102,12 +110,14 @@ model.save(file_path)
 #### Serving
 
 Case where a user want to serve the trained model for a single image.
+
 ```python
 loaded_model = tf.keras.models.load(file_path)
 box_coder = keras_cv.ops.BoxCoder(offset='sigmoid')
 anchor_generator = keras_cv.ops.AnchorGenerator()
 anchor_boxes = anchor_generator(image_size)
 detection_generator = keras_cv.layers.NMSDetectionDecoder()
+
 @tf.function
 def serving_fn(image):
   batched_image = tf.expand_dims(image)
@@ -120,6 +130,7 @@ def serving_fn(image):
 ## Detailed Design
 
 #### Ops -- AnchorGenerator
+
 ```python
 class AnchorGenerator:
   """Utility to generate anchors for a multiple feature maps."""
@@ -159,6 +170,7 @@ class AnchorGenerator:
 ```
 
 #### Ops -- BoxMatcher
+
 ```python
 class BoxMatcher:
   """Matcher based on highest value.
@@ -222,6 +234,7 @@ class BoxMatcher:
 ```
 
 #### Ops -- IOUSimilarity
+
 ```python
 class IouSimilarity:
   """Class to compute similarity based on Intersection over Union (IOU) metric."""
@@ -247,6 +260,7 @@ class IouSimilarity:
 ```
 
 #### Ops -- TargerGather
+
 ```python
 class AnchorLabeler:
   """Labeler for dense object detector."""
@@ -271,6 +285,7 @@ class AnchorLabeler:
 ```
 
 #### Losses -- Focal
+
 ```python
 class FocalLoss(tf.keras.losses.Loss):
   """Implements a Focal loss for classification problems.
@@ -314,6 +329,7 @@ class FocalLoss(tf.keras.losses.Loss):
 ```
 
 #### Ops -- BoxCoder
+
 ```python
 class BoxCoder:
   """box coder for RetinaNet, FasterRcnn, SSD, and YOLO."""
@@ -337,6 +353,7 @@ class BoxCoder:
 ```
 
 #### Layers -- NMSDetectionDecoder
+
 ```python
 class NMSDetectionDecoder(tf.keras.layers.Layer):
   """Generates detected boxes with scores and classes for one-stage detector."""
@@ -393,4 +410,5 @@ class NMSDetectionDecoder(tf.keras.layers.Layer):
 ```
 
 ## Questions and Discussion Topics
+
 Gathering feedbacks on arguments & naming conventions.
