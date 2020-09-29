@@ -45,12 +45,9 @@ test_ds = imdb_reviews['test'].batch(32)
 # Tokenization with BertTokenizer
 vocab_path = "gs://<bucket_name>/<file_path>/vocab.txt"
 tokenizer = tftext.BertTokenizer(vocab_path, token_out_type=tf.int64, lower_case=False)
-MAX_SEQ_LENGTH = 128
+SEQUENCE_LENGTH = 128
 def preprocess(input_text):
-  token_ids = tokenizer.tokenize(input_text)
-  cls = tf.expand_dims(tf.expand_dims(tf.cast(tf.tile([101], [token_ids.nrows()]), tf.int64), axis=1), axis=1)
-  sep = tf.expand_dims(tf.expand_dims(tf.cast(tf.tile([102], [token_ids.nrows()]), tf.int64), axis=1), axis=1)
-  token_ids = tf.concat([cls, token_ids, sep], axis=1)
+  token_ids = tokenizer.tokenize_with_offsets(input_text)
   segment_ids = tf.concat([tf.zeros_like(cls), tf.ones_like(token_ids), tf.ones_like(sep)], axis=1)
   output_shape = [None, SEQUENCE_LENGTH]
   token_ids = token_ids.merge_dims(-2, -1)
@@ -66,16 +63,14 @@ def preprocess(input_text):
 strategy = tf.distribute.TPUStrategy(...)
 with strategy.scope():
   encoder = keras_nlp.encoders.BertEncoder(vocab_size=30522, max_sequence_length=512, type_vocab_size=2)
-  checkpoint_path = "gs://<bucket_name>/<file_path>"
-  checkpoint = tf.train.Checkpoint(model=encoder)
-  checkpoint.restore(checkpoint_path).assert_consumed().run_restore_ops()
-  input_ids = tf.keras.layers.Input(shape=(SEQUENCE_LENGTH,), name='input_ids', dtype=tf.int32)
+  encoder.load_weights("gs://<bucket_name>/<file_path>")
+  token_ids = tf.keras.layers.Input(shape=(SEQUENCE_LENGTH,), name='input_ids', dtype=tf.int32)
   input_mask = tf.keras.layers.Input(shape=(SEQUENCE_LENGTH,), name='input_mask', dtype=tf.int32)
-  label_ids = tf.keras.layers.Input(shape=(128,), name='input_type_ids', dtype=tf.int32)
-  x = encoder([input_ids, input_mask, label_ids])['pooled_output']
+  type_ids = tf.keras.layers.Input(shape=(128,), name='input_type_ids', dtype=tf.int32)
+  x = encoder([token_ids, input_mask, type_ids])['pooled_output']
   x = tf.keras.layers.Dropout(rate=0.1)(x)
   output = tf.keras.layers.Dense(1, activation='sigmoid')(x)
-  model = tf.keras.Model(inputs=[input_ids, input_mask, label_ids], outputs=output)
+  model = tf.keras.Model(inputs=[token_ids, input_mask, type_ids], outputs=output)
 
 model.compile('adam', 'binary_crossentropy', ['accuracy'])
 model.fit(train_ds, epochs=5, validation_data=test_ds)
@@ -83,22 +78,22 @@ model.fit(train_ds, epochs=5, validation_data=test_ds)
 
 ### Pretraining task
 
-We aim to provide pretrained checkpoints for `BertEncoder`, however the user can choose to pretrain a new BertEncoder based on their
-own dataset.
+We aim to provide pretrained checkpoints for `BertEncoder` with different datasets and different sizes through TF Hub,
+however the user can choose to pretrain a new BertEncoder based on their own dataset.
 
 ```python
 with strategy.scope():
   encoder = keras_nlp.encoders.BertEncoder(vocab_size, max_sequence_length, type_vocab_size)
-  input_ids = tf.keras.layers.Input(shape=(SEQUENCE_LENGTH,), name='input_ids', dtype=tf.int32)
+  token_ids = tf.keras.layers.Input(shape=(SEQUENCE_LENGTH,), name='word_token_ids', dtype=tf.int32)
   input_mask = tf.keras.layers.Input(shape=(SEQUENCE_LENGTH,), name='input_mask', dtype=tf.int32)
-  label_ids = tf.keras.layers.Input(shape=(128,), name='input_type_ids', dtype=tf.int32)
+  type_ids = tf.keras.layers.Input(shape=(128,), name='input_type_ids', dtype=tf.int32)
   masked_lm_positions = tf.keras.layers.Input(shape=(None,), name='masked_lm_positions', dtype=tf.int32)
-  x = encoder([input_ids, input_mask, label_ids])['pooled_output']
+  x = encoder([token_ids, input_mask, type_ids])['pooled_output']
   cls_output, sequence_output = output['pooled_output'], outputs['sequence_output']
   masked_lm = keras_nlp.layers.MaskedLM(embedding_table=encoder.get_embedding_table())
   lm_output = masked_lm(sequence_output, masked_positions=masked_lm_positions)
   cls_output = tf.keras.layers.Dense(units=num_classes, activation='softmax')(cls_output)
-  model = tf.keras.Model(inputs=[input_ids, input_mask, label_ids, masked_lm_positions],
+  model = tf.keras.Model(inputs=[token_ids, input_mask, type_ids, masked_lm_positions],
                          outputs={'lm_output': masked_lm, 'cls_output': cls_output})
 
 model.compile('adam', {'lm_output': 'sparse_categorical_crossentropy', 'cls_output': 'sparse_categorical_crossentropy'})
@@ -108,17 +103,15 @@ model.fit(train_ds, epochs=100)
 ### Other encoder-based networks
 
 `BertEncoder` is the first encoder network we propose in this doc. However other encoder networks can be easily
-built on top of the `TransformerEncoderBlock` layer. For example, for a transformer encoder sharing mechanism
+built on top of the `TransformerEncoder` layer. For example, for a transformer encoder sharing mechanism
 with [ALBERT](https://arxiv.org/pdf/1909.11942.pdf), this can be achieved by:
 
 ```python
-word_ids = tf.keras.layers.Input(shape=(None,), dtype=tf.int32, name='input_word_ids')
+token_ids = tf.keras.layers.Input(shape=(None,), dtype=tf.int32, name='input_word_ids')
 mask = tf.keras.layers.Input(shape=(None,), dtype=tf.int32, name='input_mask')
 type_ids = tf.keras.layers.Input(shape=(None,), dtype=tf.int32, name='input_type_ids')
-embedding_layer = keras_nlp.layers.OnDeviceEmbedding(vocab_size, embedding_width)
-word_embeddings = embedding_layer(word_ids)
-position_embedding_layer = keras_nlp.layers.PositionEmbedding(max_sequence_length)
-position_embeddings = position_embedding_layer(word_embeddings)
+word_embeddings = keras_nlp.layers.OnDeviceEmbedding(vocab_size, embedding_width)(token_ids)
+position_embeddings = keras_nlp.layers.PositionEmbedding(max_sequence_length)(word_embeddings)
 type_embeddings = keras_nlp.layers.OnDeviceEmbedding(
   vocab_size=type_vocab_size, embedding_width=embedding_width, use_one_hot=True)(type_ids)
 embeddings = tf.keras.layers.Add()([word_embeddings, position_embeddings, type_embeddings])
@@ -128,7 +121,7 @@ embeddings = tf.keras.layers.experimental.EinsumDense(
   '...x,xy->...y', output_shape=hidden_size, bias_axes='y')(embeddings)
 data = emnbeddings
 attention_mask = layers.SelfAttentionMask()([data, mask])
-shared_layer = keras_nlp.layers.TransformerEncoderBlock(num_attention_heads, inner_dim)
+shared_layer = keras_nlp.layers.TransformerEncoder(num_attention_heads, inner_dim)
 for _ in range(num_layers):
   data = shared_layer([data, attention_mask])
 first_token_tensor = tf.keras.layers.Lambda(lambda x: tf.squeeze(x[:, 0:1, :], axis=1))(data)
@@ -139,13 +132,13 @@ model = tf.keras.Model(inputs=[word_ids, mask, type_ids], outputs=outputs)
 
 ## Detailed Design
 
-### Layers -- TransformerEncoderBlock
+### Layers -- TransformerEncoder
 
 This layer encapsulates a single layer of Transformer Encoder.
 
 ```python
-class TransformerEncoderBlock(tf.keras.layers.Layer):
-  """TransformerEncoderBlock layer.
+class TransformerEncoder(tf.keras.layers.Layer):
+  """TransformerEncoder layer.
 
   This layer implements the Transformer Encoder from
   "Attention Is All You Need". (https://arxiv.org/abs/1706.03762),
@@ -178,7 +171,7 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):
                inner_dropout=0.0,
                attention_initializer=None,
                **kwargs):
-    """Initializes `TransformerEncoderBlock`.
+    """Initializes `TransformerEncoder`.
 
     Arguments:
       num_attention_heads: Number of attention heads.
@@ -217,20 +210,22 @@ class TransformerEncoderBlock(tf.keras.layers.Layer):
 
 ```python
 class SelfAttentionMask(tf.keras.layers.Layer):
-  """Create 3D attention mask from a 2D tensor mask.
+  """Create 3D attention mask from a 2D tensor mask."""
 
+  def call(self, inputs, to_mask):
+  """
+  Args:
     inputs[0]: from_tensor: 2D or 3D Tensor of shape
       [batch_size, from_seq_length, ...].
     inputs[1]: to_mask: int32 Tensor of shape [batch_size, to_seq_length].
 
-    Returns:
+  Returns:
       float Tensor of shape [batch_size, from_seq_length, to_seq_length].
   """
-
-  def call(self, inputs, to_mask):
 ```
 
 ### Layers -- OnDeviceEmbedding
+This is the experimental layer that would support either one-hot tf.matmul approach or tf.gather approach.
 
 ```python
 class OnDeviceEmbedding(tf.keras.layers.Layer):
@@ -248,9 +243,6 @@ class OnDeviceEmbedding(tf.keras.layers.Layer):
       lookup. Defaults to False (that is, using tf.gather). Setting this option
       to True may improve performance, especially on small vocabulary sizes, but
       will generally require more memory.
-    scale_factor: Whether to scale the output embeddings. Defaults to None (that
-      is, not to scale). Setting this option to a float will let values in
-      output embeddings multiplied by scale_factor.
   """
 
   def __init__(self,
@@ -258,7 +250,6 @@ class OnDeviceEmbedding(tf.keras.layers.Layer):
                embedding_width,
                initializer="glorot_uniform",
                use_one_hot=False,
-               scale_factor=None,
                **kwargs):
 ```
 
@@ -365,10 +356,10 @@ class BertEncoder(tf.keras.Model):
       max_sequence_length=512,
       type_vocab_size=16,
       inner_dim=3072,
-      inner_activation=lambda x: tf.keras.activations.gelu(x, approximate=True),
+      inner_activation='gelu',
       output_dropout=0.1,
       attention_dropout=0.1,
-      initializer=tf.keras.initializers.TruncatedNormal(stddev=0.02),
+      initializer='truncated_normal',
       output_range=None,
       embedding_width=None,
       **kwargs):
