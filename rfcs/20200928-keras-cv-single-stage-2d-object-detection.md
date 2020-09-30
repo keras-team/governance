@@ -124,7 +124,7 @@ def serving_fn(image):
   raw_boxes, scores = loaded_model(batched_image, training=False)
   decoded_boxes = box_coder.decode(raw_boxes, anchor_boxes)
   classes, scores, boxes, _ = detection_generator(scores, decoded_boxes)
-  return classes, scores, boxes
+  return {'classes': classes, 'scores': scores, 'boxes': boxes}
 ```
 
 ## Detailed Design
