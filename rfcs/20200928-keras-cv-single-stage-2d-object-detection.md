@@ -129,6 +129,147 @@ def serving_fn(image):
 
 ## Detailed Design
 
+For the rest of the design, we denote `B` as batch size, `N` as the number of ground truth boxes, and `M` as the number
+of anchor boxes.
+
+We propose 2 layers, 1 loss and 4 ops in this RFC.
+
+#### Layers -- IouSimilarity
+We propose IouSimilarity layer to support ragged tensor directly, however user can also pad ground truth
+boxes or anchor boxes and pass a mask
+ 
+```python
+class IouSimilarity(tf.keras.layers.Layer):
+  """Class to compute similarity based on Intersection over Union (IOU) metric."""
+ 
+  def __init__(self, mask_value):
+    """Initializes IouSimilarity layer.
+    Args:
+      mask_value: A float mask value to fill where `mask` is True. 
+    """
+ 
+  def __call__(self, groundtruth_boxes, anchors, mask=None):
+    """Compute pairwise IOU similarity between ground truth boxes and anchors.
+ 
+    Args:
+      groundtruth_boxes: A float Tensor [N], or [B, N] represent coordinates.
+      anchors: A float Tensor [M], or [B, M] represent coordinates.
+      mask: A boolean tensor with [N, M] or [B, N, M].
+ 
+    Returns:
+      A float tensor with shape [M, N] or [B, M, N] representing pairwise
+        iou scores, anchor per row and groundtruth_box per colulmn.
+ 
+    Input shape:
+      groundtruth_boxes: [N, 4], or [B, N, 4]
+      anchors: [M, 4], or [B, M, 4]
+ 
+    Output shape:
+      [M, N], or [B, M, N]
+    """
+```
+
+#### Layers -- NMSDetectionDecoder
+
+```python
+class NMSDetectionDecoder(tf.keras.layers.Layer):
+  """Generates detected boxes with scores and classes for one-stage detector."""
+
+  def __init__(self,
+               pre_nms_top_k=5000,
+               pre_nms_score_threshold=0.05,
+               nms_iou_threshold=0.5,
+               max_num_detections=100,
+               use_batched_nms=False,
+               **kwargs):
+    """Initializes a detection generator.
+
+    Args:
+      pre_nms_top_k: int, the number of top scores proposals to be kept before
+        applying NMS.
+      pre_nms_score_threshold: float, the score threshold to apply before
+        applying  NMS. Proposals whose scores are below this threshold are
+        thrown away.
+      nms_iou_threshold: float in [0, 1], the NMS IoU threshold.
+      max_num_detections: int, the final number of total detections to generate.
+      use_batched_nms: bool, whether or not use
+        `tf.image.combined_non_max_suppression`.
+      **kwargs: other key word arguments passed to Layer.
+    """
+
+  def call(self, raw_boxes, raw_scores, anchor_boxes, image_shape):
+    """Generate final detections.
+
+    Args:
+      raw_boxes: a single Tensor or dict with keys representing FPN levels and values
+        representing box tenors of shape
+        [batch, feature_h, feature_w, num_anchors * 4].
+      raw_scores: a single Tensor or dict with keys representing FPN levels and values
+        representing logit tensors of shape
+        [batch, feature_h, feature_w, num_anchors].
+      anchor_boxes: a tensor of shape of [batch_size, K, 4] representing the
+        corresponding anchor boxes w.r.t `box_outputs`.
+      image_shape: a tensor of shape of [batch_size, 2] storing the image height
+        and width w.r.t. the scaled image, i.e. the same image space as
+        `box_outputs` and `anchor_boxes`.
+
+    Returns:
+    `detection_boxes`: float Tensor of shape [B, max_num_detections, 4]
+      representing top detected boxes in [y1, x1, y2, x2].
+    `detection_scores`: float Tensor of shape [B, max_num_detections]
+      representing sorted confidence scores for detected boxes. The values
+      are between [0, 1].
+    `detection_classes`: int Tensor of shape [B, max_num_detections]
+      representing classes for detected boxes.
+    `num_detections`: int Tensor of shape [B] only the first
+      `num_detections` boxes are valid detections
+    """
+```
+
+#### Losses -- Focal
+
+```python
+class FocalLoss(tf.keras.losses.Loss):
+  """Implements a Focal loss for classification problems.
+
+  Reference:
+    [Focal Loss for Dense Object Detection](https://arxiv.org/abs/1708.02002).
+  """
+
+  def __init__(self,
+               alpha,
+               gamma,
+               reduction=tf.keras.losses.Reduction.AUTO,
+               name=None):
+    """Initializes `FocalLoss`.
+
+    Arguments:
+      alpha: The `alpha` weight factor for binary class imbalance.
+      gamma: The `gamma` focusing parameter to re-weight loss.
+      reduction: (Optional) Type of `tf.keras.losses.Reduction` to apply to
+        loss. Default value is `AUTO`. `AUTO` indicates that the reduction
+        option will be determined by the usage context. For almost all cases
+        this defaults to `SUM_OVER_BATCH_SIZE`. When used with
+        `tf.distribute.Strategy`, outside of built-in training loops such as
+        `tf.keras` `compile` and `fit`, using `AUTO` or `SUM_OVER_BATCH_SIZE`
+        will raise an error. Please see this custom training [tutorial](
+          https://www.tensorflow.org/tutorials/distribute/custom_training) for
+            more details.
+      name: Optional name for the op. Defaults to 'retinanet_class_loss'.
+    """
+
+  def call(self, y_true, y_pred):
+    """Invokes the `FocalLoss`.
+
+    Arguments:
+      y_true: A tensor of size [batch, num_anchors, num_classes]
+      y_pred: A tensor of size [batch, num_anchors, num_classes]
+
+    Returns:
+      Summed loss float `Tensor`.
+    """
+```
+
 #### Ops -- AnchorGenerator
 
 ```python
@@ -233,36 +374,10 @@ class BoxMatcher:
     """
 ```
 
-#### Ops -- IOUSimilarity
+#### Ops -- TargetGather
 
 ```python
-class IouSimilarity:
-  """Class to compute similarity based on Intersection over Union (IOU) metric."""
-
-  def __call__(self, groundtruth_boxes, anchors):
-    """Compute pairwise IOU similarity between ground truth boxes and anchors.
-
-    Args:
-      groundtruth_boxes: a float Tensor with N boxes.
-      anchors: a float Tensor with M boxes.
-
-    Returns:
-      A tensor with shape [M, N] or [B, M, N] representing pairwise
-        iou scores, anchor per row and groundtruth_box per colulmn.
-
-    Input shape:
-      groundtruth_boxes: [N, 4], or [B, N, 4]
-      anchors: [M, 4], or [batch_size, M, 4]
-
-    Output shape:
-      [M, N], or [batch_size, M, N]
-    """
-```
-
-#### Ops -- TargerGather
-
-```python
-class AnchorLabeler:
+class TargetGather:
   """Labeler for dense object detector."""
 
   def __init__(self):
@@ -281,50 +396,6 @@ class AnchorLabeler:
       mask_val: An python primitive to fill in places where mask is True.
     Returns:
       targets: A tensor with [M, dim] or [B, M, dim] selected from the `match_indices`.
-    """
-```
-
-#### Losses -- Focal
-
-```python
-class FocalLoss(tf.keras.losses.Loss):
-  """Implements a Focal loss for classification problems.
-
-  Reference:
-    [Focal Loss for Dense Object Detection](https://arxiv.org/abs/1708.02002).
-  """
-
-  def __init__(self,
-               alpha,
-               gamma,
-               reduction=tf.keras.losses.Reduction.AUTO,
-               name=None):
-    """Initializes `FocalLoss`.
-
-    Arguments:
-      alpha: The `alpha` weight factor for binary class imbalance.
-      gamma: The `gamma` focusing parameter to re-weight loss.
-      reduction: (Optional) Type of `tf.keras.losses.Reduction` to apply to
-        loss. Default value is `AUTO`. `AUTO` indicates that the reduction
-        option will be determined by the usage context. For almost all cases
-        this defaults to `SUM_OVER_BATCH_SIZE`. When used with
-        `tf.distribute.Strategy`, outside of built-in training loops such as
-        `tf.keras` `compile` and `fit`, using `AUTO` or `SUM_OVER_BATCH_SIZE`
-        will raise an error. Please see this custom training [tutorial](
-          https://www.tensorflow.org/tutorials/distribute/custom_training) for
-            more details.
-      name: Optional name for the op. Defaults to 'retinanet_class_loss'.
-    """
-
-  def call(self, y_true, y_pred):
-    """Invokes the `FocalLoss`.
-
-    Arguments:
-      y_true: A tensor of size [batch, num_anchors, num_classes]
-      y_pred: A tensor of size [batch, num_anchors, num_classes]
-
-    Returns:
-      Summed loss float `Tensor`.
     """
 ```
 
@@ -352,63 +423,9 @@ class BoxCoder:
     """Compute coord from coded_coord."""
 ```
 
-#### Layers -- NMSDetectionDecoder
-
-```python
-class NMSDetectionDecoder(tf.keras.layers.Layer):
-  """Generates detected boxes with scores and classes for one-stage detector."""
-
-  def __init__(self,
-               pre_nms_top_k=5000,
-               pre_nms_score_threshold=0.05,
-               nms_iou_threshold=0.5,
-               max_num_detections=100,
-               use_batched_nms=False,
-               **kwargs):
-    """Initializes a detection generator.
-
-    Args:
-      pre_nms_top_k: int, the number of top scores proposals to be kept before
-        applying NMS.
-      pre_nms_score_threshold: float, the score threshold to apply before
-        applying  NMS. Proposals whose scores are below this threshold are
-        thrown away.
-      nms_iou_threshold: float in [0, 1], the NMS IoU threshold.
-      max_num_detections: int, the final number of total detections to generate.
-      use_batched_nms: bool, whether or not use
-        `tf.image.combined_non_max_suppression`.
-      **kwargs: other key word arguments passed to Layer.
-    """
-
-  def call(self, raw_boxes, raw_scores, anchor_boxes, image_shape):
-    """Generate final detections.
-
-    Args:
-      raw_boxes: a dict with keys representing FPN levels and values
-        representing box tenors of shape
-        [batch, feature_h, feature_w, num_anchors * 4].
-      raw_scores: a dict with keys representing FPN levels and values
-        representing logit tensors of shape
-        [batch, feature_h, feature_w, num_anchors].
-      anchor_boxes: a tensor of shape of [batch_size, K, 4] representing the
-        corresponding anchor boxes w.r.t `box_outputs`.
-      image_shape: a tensor of shape of [batch_size, 2] storing the image height
-        and width w.r.t. the scaled image, i.e. the same image space as
-        `box_outputs` and `anchor_boxes`.
-
-    Returns:
-    `detection_boxes`: float Tensor of shape [batch, max_num_detections, 4]
-      representing top detected boxes in [y1, x1, y2, x2].
-    `detection_scores`: float Tensor of shape [batch, max_num_detections]
-      representing sorted confidence scores for detected boxes. The values
-      are between [0, 1].
-    `detection_classes`: int Tensor of shape [batch, max_num_detections]
-      representing classes for detected boxes.
-    `num_detections`: int Tensor of shape [batch] only the first
-      `num_detections` boxes are valid detections
-    """
-```
-
 ## Questions and Discussion Topics
 
-Gathering feedbacks on arguments & naming conventions.
+* Whether `BoxMatcher` should take a list of thresholds (e.g., size 2) and a list of values (e.g., size 3).
+* Gathering feedbacks on arguments & naming conventions.
+* How to better generalize box coding, to differentiate RCNN-family encoding and YOLO-family encoding.
+* Whether to have BoxCoder(inverse=False) and a single call method, or BoxCoder with `encode` and `decode` methods.
