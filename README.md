@@ -33,10 +33,9 @@ Selection process: From time to time, the chairs may revise the group's membersh
 
 Key stakeholders:
 
-- Karmel Allison, Google (karmel@google.com)
-- Martin Wicke, Google (wicke@google.com)
+- Tom O'Malley (omalleyt@google.com)
+- Zhenyu Tan (tanzheny@google.com)
 - Stan Bileschi, Google (bileschi@google.com)
-- Paige Bailey, Google (webpaige@google.com)
 - Adam Gibson, Konduit (adam@konduit.ai)
 - JJ Allaire, RStudio (jj@rstudio.com)
 
