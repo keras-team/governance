@@ -2,21 +2,21 @@
 
 | Status        | (Proposed)       |
 :-------------- |:---------------------------------------------------- |
-| **Author(s)** | Gareth Jones (gareth@example.org)                    |
-| **Sponsor**   | A N Expert (expert@example.org)                      |
+| **Author(s)** | Gareth Jones (gareth@arturo.ai)                    |
+| **Sponsor**   | Needs Sponsor                      |
 | **Updated**   | 2020-11-19                                           |
 
 
 ## Objective
 
-Improve the ability to control the `training` arg to by introducing `training` property on the base layer. 
+Improve the ability to control the `training` arg by introducing a `training` property on the base layer. 
 
 ## Motivation
 
-It is difficult to fine tune many kinds of models because the training
+It is difficult to fine-tune many kinds of models because the training
 argument is difficult to access. Adding a property would make it easier to
-configure more modular models like segmentation models to better support 
-transfer learning applications
+configure modular models, e.g. segmentation models to better support 
+transfer learning applications.
 
 ```python
 # A keras Model with two sub networks, backbone and head
@@ -44,15 +44,16 @@ model(x, training=True)
 
 ## User Benefit
 
-Extends Keras to support transfer learning across a more diverse set of uses cases with
-an intuitive interface
+Extend the Keras base layer to better support transfer learning across a diverse set of use cases with
+an intuitive interface.
 
 ## Design Proposal
 
-The `training` property would take precedence over the 4 exiting cases for determining
-the state of `training`. The comment in `__call__` would be updated:
+Introduce a `training` property to take precedence over the 5 existing cases for determining
+the state of `training` in a layer.
 
 ```python
+# -- except from __call__
 # Training mode for `Layer.call` is set via (in order of priority):
 # (1) The `training` property set on this layer, if it was explicitly set
 # (2) The `training` argument passed to this `Layer.call`, if it is not None
@@ -73,10 +74,21 @@ if self._expects_training_arg():
   self.training = self._default_training_arg() # in setter: _training_prop_set = True
   
 self._training_prop_set = False
-
 ```
 
-## Detailed Design
+Possible code change to precedence
+
+```python
+
+# def _set_training_mode
+if self._expects_training_arg:
+  # (1) `training` was set
+  if self._training_prop_set:
+    training_mode = self.training
+  # (2) `training` was passed to this `Layer.call`.
+  elif self._call_arg_was_passed('training', args, kwargs):
+    training_mode = self._get_call_arg_value('training', args, kwargs)
+```
 
 ## Questions and Discussion Topics
 
