@@ -10,6 +10,7 @@
 
 We aim at providing the core primitive components for training and serving single-stage two-dimensional object
 detection models, such as Single-Shot MultiBox Detector (SSD), RetinaNet, and You-Only-Look-Once (YOLO).
+Pretrained models will also be provides, similar to keras-applications.
 
 ## Key Benefits
 
@@ -20,8 +21,7 @@ With this proposal, Keras users will be able to build end-to-end models with a s
 
 ## Design overview
 
-This proposal includes the specific core components for building single-stage object detection models. It does not,
-include, however, include:
+This proposal includes the specific core components for building single-stage object detection models. It does not, however, include:
 
 1. Data augmentation, such as image and groundtruth box preprocessing
 2. Model backbone, such as DarkNet, or functions to generate feature maps
@@ -53,7 +53,7 @@ def preprocess(features):
   return image, gt_boxes, gt_labels
 
 anchor_generator = keras_cv.ops.AnchorGenerator(anchor_sizes, scales, aspect_ratios, strides)
-similarity_calculator = keras_cv.ops.IOUSimilarity()
+similarity_calculator = keras_cv.layers.IOUSimilarity()
 box_matcher = keras_cv.ops.BoxMatcher(positive_threshold, negative_threshold)
 target_gather = keras_cv.ops.TargetGather()
 box_coder = keras_cv.ops.BoxCoder(offset='sigmoid')
@@ -148,7 +148,7 @@ class IouSimilarity(tf.keras.layers.Layer):
       mask_value: A float mask value to fill where `mask` is True. 
     """
  
-  def __call__(self, groundtruth_boxes, anchors, mask=None):
+  def call(self, groundtruth_boxes, anchors, mask=None):
     """Compute pairwise IOU similarity between ground truth boxes and anchors.
  
     Args:
@@ -237,8 +237,8 @@ class FocalLoss(tf.keras.losses.Loss):
   """
 
   def __init__(self,
-               alpha,
-               gamma,
+               alpha=0.25,
+               gamma=2.0,
                reduction=tf.keras.losses.Reduction.AUTO,
                name=None):
     """Initializes `FocalLoss`.
