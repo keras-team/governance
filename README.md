@@ -14,7 +14,7 @@ The SIG covers all aspects of the Keras API, in particular:
 
 - Design of the core Keras API specification (including its implementations in `tf.keras` and `keras-team/keras`).
 - Design of the Keras-related file formats.
-- Design of the API of all Keras-brand projects, such as AutoKeras and Keras-Tuner.
+- Design of the API of all Keras-brand projects, such as AutoKeras and KerasTuner.
 
 ---
 
@@ -26,21 +26,29 @@ Role: final call in decisions related to the Keras API.
 
 - Francois Chollet (fchollet@google.com)
 
-### Committee chairs
+### Governance committee members
 
 Role: represent the interests of different stakeholders during design discussions.
 Selection process: From time to time, the chairs may revise the group's membership to ensure the project's interests are well represented.
 
-Key stakeholders:
+Google team members:
 
-- Tom O'Malley (omalleyt@google.com)
-- Zhenyu Tan (tanzheny@google.com)
-- Stan Bileschi, Google (bileschi@google.com)
-- Adam Gibson, Konduit (adam@konduit.ai)
-- JJ Allaire, RStudio (jj@rstudio.com)
+- Ahmed Eldeeb
+- Chen Qian
+- Haifeng Jin
+- Katherine Wu
+- Martin Görner
+- Matt Watson
+- Scott Zhu
+- Rick Chao
+- Tomer Kaftan
+- Yash Katariya
+
 
 Core Keras community contributors:
 
+- Adam Gibson, Konduit (adam@konduit.ai)
+- JJ Allaire, RStudio (jj@rstudio.com)
 - Fariz Rahman (farizrahman4u@gmail.com)
 - Frederic Branchaud-Charron (Frederic.Branchaud-Charron@usherbrooke.ca)
 - Taehoon Lee (me@taehoonlee.com)
