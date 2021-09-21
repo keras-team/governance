@@ -163,24 +163,25 @@ the evaluation results back to the tuner.
 
 ```py
 class MyTuner(kt.Tuner):
-  def run_trial(self, trial, callbacks=None, **kwargs):
+  def run_trial(self, trial, x, y, callbacks=None, **kwargs):
     hp = trial.hyperparameters
     # Data preprocessing
     num_features = hp.Int("num_features", 10, 15)
-    dataset.map(feature_selection(num_features=num_features))
+    x, y = feature_selection(num_features=num_features, x, y)
     # Model building
     # Input shape depending on data preprocessing.
     inputs = keras.Input(shape=(num_features,))
-    x = keras.layers.Dense(
+    outputs = keras.layers.Dense(
         hp.Choice('units', [8, 16, 32]),
         activation='relu')(inputs)
-    outputs = keras.layers.Dense(1, activation='relu')(x)
+    outputs = keras.layers.Dense(1, activation='relu')(outputs)
     model = keras.Model(inputs=inputs, outputs=outputs)
     model.compile(loss='mse',
                   metrics=['mae'])
     # Model training
     history = model.fit(
-        dataset,
+        x,
+        y,
         epochs=100,
         validation_data=validation_data,
         # Tune whether to use shuffle.
@@ -197,16 +198,16 @@ class MyTuner(kt.Tuner):
 # When Tuner.run_trial is overridden,
 # `hypermodel` and `objective` are optional.
 tuner = MyTuner(
- max_trials=3,
- executions_per_trial=2,
- overwrite=True,
- directory="my_dir",
- project_name="helloworld",
+    max_trials=3,
+    executions_per_trial=2,
+    overwrite=True,
+    directory="my_dir",
+    project_name="helloworld",
 )
 
 # Anything passed to `search()` will
 # go to `**kwargs` for `Tuner.run_trial()`.
-tuner.search()
+tuner.search(x, y)
 # Get the best model.
 best_model = tuner.get_best_models()[0]
 ```
@@ -239,7 +240,7 @@ evaluation results.
 
 ```py
 class MyTuner(kt.Tuner):
- def run_trial(self, trial, callbacks=None, dataset=None, **kwargs):
+ def run_trial(self, trial, **kwargs):
    hp = trial.hyperparameters
    return build_and_evaluate_model(
        hp.Int("num_features", 10, 15),
@@ -285,15 +286,16 @@ class MyHyperModel(kt.HyperModel):
                   metrics=['mae'])
     return model
   
-  def fit(self, hp, model, dataset=None, callbacks=None, **kwargs):
+  def fit(self, hp, model, x, y, callbacks=None, **kwargs):
     # Data preprocessing
     # Get the hyperparameter value used in `build()`.
-    dataset = dataset.map(hp.get("num_features"))
+    x, y = feature_selection(num_features=hp.get("num_features"), x, y)
     # Model training
     # Returning the training history
     # or a similar dictionary if using custom training loop.
     return model.fit(
-        dataset,
+        x,
+        y,
         epochs=100,
         validation_data=validation_data,
         # Tune whether to use shuffle.
@@ -304,18 +306,18 @@ class MyHyperModel(kt.HyperModel):
         callbacks=callbacks)
 
 tuner = kt.RandomSearch(
-  hypermodel=MyHyperModel(),
-  objective=kt.Objective('val_mae', 'min'),
-  directory='dir',
-  max_trials=3,
-  executions_per_trial=2,
-  overwrite=True,
-  directory="my_dir",
-  project_name="helloworld",
+    hypermodel=MyHyperModel(),
+    objective=kt.Objective('val_mae', 'min'),
+    directory='dir',
+    max_trials=3,
+    executions_per_trial=2,
+    overwrite=True,
+    directory="my_dir",
+    project_name="helloworld",
 )
 
 # Any arg passed to `search()` would be passed to `fit()`.
-tuner.search()
+tuner.search(x, y)
 
 # Exporting the best models.
 models = tuner.get_best_models(num_models=2)
@@ -327,7 +329,7 @@ model = hypermodel.build(second_best_hp)
 hypermodel.fit(model, hp=second_best_hp, callbacks=[], dataset=new_dataset)
 ```
 
-There are three details in this workflow that are worth attention.
+Please take note of the following four points:
 
 * Similar to `Tuner.run_trial()`, the return value of the fit function supports
   all different formats.
@@ -447,44 +449,35 @@ class MyHyperModel(kt.HyperModel):
     return min_val_loss
 ```
 
-You may also subclass `keras.Model` to override `train_step`.
+You may also subclass `keras.Model` to override `train_step()`.
 
 #### Fine tuning with pretrained weights
 
 ```py
-class FineTuneModel(keras.Model):
-  def __init__(self, base_model, head):
-    self.base_model = base_model
-    self.head = head
-  def call(self, inputs):
-    return self.head(self.base_model(inputs))
-
 class MyHyperModel(kt.HyperModel):
 
   def build(self, hp):
-    head = keras.Sequential([
-      layers.GlobalAveragePooling2D(),
-      layers.Dense(hp.Int("units", 32, 128)),
-      layers.Dense(1),
-    ])
-    return FineTuneModel(
-        base_model=keras.applications.ResNet50(
+    return keras.Sequential([
+        keras.applications.ResNet50(
             weights="imagenet",
             input_shape=(32, 32, 3),
             include_top=False,
         ),
-        head=head)
+        layers.GlobalAveragePooling2D(),
+        layers.Dense(hp.Int("units", 32, 128)),
+        layers.Dense(1),
+    ])
   
   def fit(self, hp, model, dataset, validation_data, callbacks, **kwargs):
     # Fit the model with the `base_model` freezed.
-    model.base_model.trainable = False
+    model.layers[0].trainable = False
     model.compile(
         optimizer="adam",
         loss=keras.losses.BinaryCrossentropy(from_logits=True),
     )
     model.fit(dataset, epochs=20)
     # Fit the model again with some layers in the `base_model` freezed.
-    model.base_model.trainable = True
+    model.layers[0].trainable = True
     for layer in model.layers[:hp.Int("freeze", 0, 20)]:
       layer.trainable = False
     model.compile(
