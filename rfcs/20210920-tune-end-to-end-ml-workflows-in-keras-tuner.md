@@ -118,7 +118,7 @@ information from `Tuner.run_trial()` to HyperModel.build.
 
 #### Tune existing Keras code
 
-If the users have their code of model building and training ready written using
+If the users have their code for model building and training ready written using
 Keras, and they want to tune some of the hyperparameters, they would have to
 change the code a lot to separate their code apart and wire the data flow and
 control flow between the overridden functions.
@@ -371,14 +371,14 @@ class MyHyperModel(kt.HyperModel):
     model.compile(loss='mse')
     return model
   
-  def fit(self, hp, model, x, y, validation_data, callbacks, **kwargs):
+  def fit(self, hp, model, dataset, validation_data, callbacks, **kwargs):
     # Create and adapt the text vectorizer.
     text_vectorizer = layers.TextVectorization(
         # The max_tokens is a hyperparameter created in build().
         max_tokens=hp.get("max_tokens"),
         output_mode="int",
         output_sequence_length=10)
-    text_vectorizer.adapt(x)
+    text_vectorizer.adapt(dataset.map(lambda x, y: x))
   
     # Save the text vectorization model.
     keras.Sequential([text_vectorizer]).save(
@@ -386,8 +386,9 @@ class MyHyperModel(kt.HyperModel):
   
     return model.fit(
         # Convert x from strings to integer vectors.
-        text_vectorizer(x),
-        y,
+        dataset.map(
+            lambda x, y: (text_vectorizer(x), y),
+            num_parallel_calls=tf.data.AUTOTUNE),
         validation_data=validation_data,
         callbacks=callbacks,
     )
@@ -494,7 +495,7 @@ class MyHyperModel(kt.HyperModel):
 
 ### API documentation
 
-The APIs in the new HyperModel class are as follows.
+The APIs in the new `HyperModel` class are as follows.
 
 ```py
 class HyperModel():
