@@ -286,7 +286,7 @@ class MyHyperModel(kt.HyperModel):
                   metrics=['mae'])
     return model
   
-  def fit(self, hp, model, x, y, callbacks=None, **kwargs):
+  def fit(self, hp, model, x, y, validation_data, callbacks=None, **kwargs):
     # Data preprocessing
     # Get the hyperparameter value used in `build()`.
     x, y = feature_selection(num_features=hp.get("num_features"), x, y)
@@ -326,7 +326,19 @@ models = tuner.get_best_models(num_models=2)
 second_best_hp = tuner.get_best_hyperparameters(num_models=2)[1]
 hypermodel = MyHyperModel()
 model = hypermodel.build(second_best_hp)
-hypermodel.fit(model, hp=second_best_hp, callbacks=[], dataset=new_dataset)
+hypermodel.fit(
+    hp=second_best_hp, 
+    model=model,
+    x=new_x,
+    y=new_y,
+    validation_data=new_validation_data,
+    # Save the model at its best epoch to a custom path
+    callbacks=[tf.keras.callbacks.ModelCheckpoint(
+        filepath="path_to_checkpoint",
+        monitor='val_loss',
+        save_best_only=True)])
+# Save the final model.
+model.save("path_to_saved_model")
 ```
 
 Please take note of the following four points:
