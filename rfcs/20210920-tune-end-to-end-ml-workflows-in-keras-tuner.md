@@ -370,6 +370,14 @@ Here we present HyperModel code examples of three important use cases:
 #### Text tokenization
 
 ```py
+import json
+
+# Save the vocabulary to disk before search.
+text_vectorizer = layers.TextVectorization()
+text_vectorizer.adapt(dataset.map(lambda x, y: x))
+with open('vocab.json', 'w') as f:
+  json.dump(text_vectorizer.get_vocabulary(), f)
+
 class MyHyperModel(kt.HyperModel):
   def build(self, hp):
     inputs = keras.Input(shape=(10,))
@@ -384,17 +392,16 @@ class MyHyperModel(kt.HyperModel):
     return model
   
   def fit(self, hp, model, dataset, validation_data, callbacks, **kwargs):
+    # Load the vocabulary from file.
+    with open('vocab.json', 'r') as f:
+      vocab = json.load(f)
+
     # Create and adapt the text vectorizer.
     text_vectorizer = layers.TextVectorization(
         # The max_tokens is a hyperparameter created in build().
-        max_tokens=hp.get("max_tokens"),
+        vocabulary=vocab[:hp.get("max_tokens")],
         output_mode="int",
         output_sequence_length=10)
-    text_vectorizer.adapt(dataset.map(lambda x, y: x))
-  
-    # Save the text vectorization model.
-    keras.Sequential([text_vectorizer]).save(
-        os.path.join(self.trial_dir, "text_vectorization_model"))
   
     return model.fit(
         # Convert x from strings to integer vectors.
