@@ -37,8 +37,8 @@ pattern of `*_test.py`. For example, the tests for
 `/keras_tuner/engine/hyperparameters.py` are in
 `/keras_tuner/engine/hyperparameters_tests.py`.
 
-Integration tests may be contained in their own `/integration` directory, as
-they may require extra files such as data.
+Integration tests may be contained in their own `/keras_tuner/integration_tests`
+directory, as they may require extra files such as data.
 
 While our unit test placement is not suggested in the
 [good practices of pytest](https://docs.pytest.org/en/6.2.x/goodpractices.html)
