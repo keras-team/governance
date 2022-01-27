@@ -66,7 +66,22 @@ Fix the random seed for all tests:
 
 Create a temporary path for testing: [Link](https://docs.pytest.org/en/6.2.x/tmpdir.html).
 
-## Linting and formatting
+## Code styles
+
+### Importing Keras modules
+
+For projects based on Keras and TensorFlow, top-level imports are encouraged, like
+shows in the following example.
+
+```py
+import tensorflow as tf
+from tensorflow import keras
+```
+
+Exceptions may be acceptable when the module appeared too many times in the code,
+like `keras.layers`.
+
+### Linting and formatting
 
 We use
 [black](https://black.readthedocs.io/en/stable/),
