@@ -184,7 +184,7 @@ Note that Keras uses the following rules for writing docstrings:
 ### Error messages: a case study
 
 
-The following would be an very poor error message:
+The following would be a very poor error message:
 
 ```
 AssertionError: '1 != 3'
