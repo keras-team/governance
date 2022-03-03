@@ -4,16 +4,6 @@
 
 ---
 
-## Leadership
-
-### BDFL
-
-Role: final call in decisions related to the Keras API.
-
-- Francois Chollet (fchollet@google.com)
-
----
-
 ## Design review process
 
 Design-related communications are expected to happen primarily asynchronously via:
@@ -37,6 +27,16 @@ Note that:
 
 - Anyone is free to send out API proposals.
 - Anyone is free to comment on API proposals or ask questions.
+
+---
+
+## Leadership
+
+### BDFL
+
+Role: final call in decisions related to the Keras API.
+
+- Francois Chollet (fchollet@google.com)
 
 ---
 
