@@ -3,13 +3,13 @@
 This style guide contains information needed to write code in the style of the Keras
 codebase.
 
-### Layer-ish Functions
+### Closures for Functional API building blocks
 
 When writing Keras code it is common to create functions that apply a logical block of
 deep learning code, such as a ResNet block.  We write our blocks using a closure pattern
 that makes the behavior of these blocks mirror Keras layers.
 
-Bad:
+While this code works:
 
 ```python
 def dense_block(x, blocks, name=None):
@@ -31,7 +31,7 @@ def dense_block(x, blocks, name=None):
 x = dense_block(x, 32)
 ```
 
-Good:
+We recommend:
 
 ```python
 def DenseBlock(blocks, name=None):
@@ -54,6 +54,15 @@ def DenseBlock(blocks, name=None):
 
 # Usage:
 x = DenseBlock(32)(x)
+```
+
+### Name Generation
+
+To generate layer names for functional building blocks we recommend the use of `tf.keras.backend.generate_uid()`.
+
+e.x.:
+```
+name = f"dense_block_{backend.get_uid('dense_block')}"
 ```
 
 ### Variable names
@@ -94,6 +103,19 @@ keras.Model(...)
 keras.optimizers.Adam(...)
 layers.Layer(...)
 layers.Conv2D(...)
+```
+
+Also, prefer top level namespaces when possible:
+
+
+Instead of:
+```
+from tf.keras.layers import preprocessing
+```
+
+Prefer:
+```
+from tf.keras import layers
 ```
 
 Note: do **not** use `import keras`. Use `from tensorflow import keras` instead.
