@@ -80,7 +80,7 @@ def encode_label(image, gt_boxes, gt_labels):
 
 class FasterRCNN(tf.keras.Model):
   # includes backbone and feature pyramid head.
-  def __init__(self, backbone, roi_head, detection_head, roi_filter, roi_pooler, roi_sampler):
+  def __init__(self, backbone='resnet50_fpn', roi_head, detection_head, roi_filter, roi_pooler, roi_sampler):
     # self.backbone = Model Backbone that returns dict of feature map, or Feature Pyramid Network that wraps it
     # self.rpn_head = Region Proposal Network that provides objectness scores and bbox offset against anchor boxes
     # self.roi_filter = A filter layer that shrinks from a dense predictions to topk sparse predictions based on scores
@@ -103,13 +103,22 @@ class FasterRCNN(tf.keras.Model):
     if not training:
       rcnn_cls_scores, rcnn_bboxes = self.nms_detection_decoder(rois, rcnn_cls_scores, rcnn_bbox_offsets, image_shape)
       return rcnn_cls_scores, rcnn_bboxes
-    return {"rpn_cls_scores": rpn_cls_scores, "rpn_bbox_offsets": rpn_bbox_offsets,
+    return {"rpn_binary_scores": rpn_cls_scores, "rpn_bbox_offsets": rpn_bbox_offsets, "rpn_rois": rpn_rois,
             "rcnn_cls_scores": rcnn_cls_scores, "rcnn_bbox_offsets": rcnn_bbox_offsets}
   
   def train_step(self, data):
-    image, (gt_labels, gt_boxes), sample_weights = data
+    image, (gt_labels, gt_boxes, anchors), sample_weights = data
     with tf.GradientTape() as tape:
       outputs = self(x, training=True)
+      iou = similarity_calculator(gt_boxes, anchors)
+      matched_indices, matched_indicators = self.box_matcher(iou)
+      # this will only sample 256 proposals per image to compute the loss of a mini batch
+      pos_anchor_indices, neg_anchor_indices = self.rpn_proposal_sampler(matched_indicators)
+      sampled_rpn_scores_pred = tf.gather(outputs["rpn_binary_scores"], tf.concat(pos_anchor_indices, neg_anchor_indices))
+      sampled_rpn_scores_true = tf.concat(tf.ones_like(pos_proposal_indices), tf.zeros_like(neg_proposal_indices))
+      rpn_cls_loss = cls_loss_fn(sampled_rpn_scores_true, sampled_rpn_scores_pred)
+      pos_box_targets = target_gather(gt_boxes, matched_indices, ?, ?)
+      rpn_reg_loss = reg_loss_fn(pos_box_targets, outputs["rpn_bbox_offsets"], mask)
       
 
 transformed_train_ds = train_ds.map(preprocess).map(encode_label).batch(128).shuffle(1024)
