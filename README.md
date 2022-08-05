@@ -1,60 +1,12 @@
-# Keras API Special Interest Group (SIG)
+# Keras governance structure
 
 ![Keras logo](https://s3.amazonaws.com/keras.io/img/keras-logo-2018-large-1200.png)
 
 ---
 
-## Scope of the Keras SIG
-
-The purpose of the Keras SIG is to provide a formal structure to supervise the evolution of the Keras API,
-while giving a voice to all keys stakeholders. The SIG consists of a process that anyone can follow to make API proposals,
-public design review meetings, and a comittee that reviews the proposals and makes final decisions about what should be in the Keras API.
-
-The SIG covers all aspects of the Keras API, in particular:
-
-- Design of the core Keras API specification (including its implementations in `tf.keras` and `keras-team/keras`).
-- Design of the Keras-related file formats.
-- Design of the API of all Keras-brand projects, such as AutoKeras and Keras-Tuner.
-
----
-
-## Leadership
-
-### BDFL
-
-Role: final call in decisions related to the Keras API.
-
-- Francois Chollet (fchollet@google.com)
-
-### Committee chairs
-
-Role: represent the interests of different stakeholders during design discussions.
-Selection process: From time to time, the chairs may revise the group's membership to ensure the project's interests are well represented.
-
-Key stakeholders:
-
-- Karmel Allison, Google (karmel@google.com)
-- Martin Wicke, Google (wicke@google.com)
-- Stan Bileschi, Google (bileschi@google.com)
-- Paige Bailey, Google (webpaige@google.com)
-- Adam Gibson, Konduit (adam@konduit.ai)
-- JJ Allaire, RStudio (jj@rstudio.com)
-
-Core Keras community contributors:
-
-- Fariz Rahman (farizrahman4u@gmail.com)
-- Frederic Branchaud-Charron (Frederic.Branchaud-Charron@usherbrooke.ca)
-- Taehoon Lee (me@taehoonlee.com)
-- Gabriel de Marmiesse (gabrieldemarmiesse@gmail.com)
-
----
-
 ## Design review process
 
-The Keras SIG meets on a bimonthly schedule to discuss current development directions.
-This is a public meeting open to anyone who is interested: the [agenda and notes are public](http://bit.ly/keras-meeting-notes). To get notifications and a calendar invitation to the public meeting, please join the [keras-meetings Google Group](https://groups.google.com/a/tensorflow.org/forum/#!forum/keras-meetings).
-
-Other communications are expected to happen primarily asynchronously via:
+Design-related communications are expected to happen primarily asynchronously via:
 
 - The Pull Requests used for API proposals.
 - [The Keras mailing list](https://groups.google.com/forum/#!forum/keras-users).
@@ -69,15 +21,22 @@ The process for writing and submitting design proposals is same as the [TensorFl
 - Open a Pull Request in the [Keras API proposals folder in this repository](https://github.com/keras-team/governance/tree/master/rfcs).
 - Send the Pull Request link to `keras-users@googlegroups.com` with a subject that starts with `[API DESIGN REVIEW]` (all caps) so that we notice it.
 - Wait for comments, and answer them as they come. Edit the proposal as necessary.
-- The proposal will finally be approved or rejected during a meeting of the Keras SIG chairs. Once approved, you can send out Pull Requests to implement the API changes or ask others to write Pull Requests (targeting `tf.keras` and `keras-team/keras`).
+- The proposal will finally be approved or rejected. Once approved, you can send out Pull Requests to implement the API changes or ask others to write Pull Requests (targeting `keras-team/keras`).
 
 Note that:
 
 - Anyone is free to send out API proposals.
 - Anyone is free to comment on API proposals or ask questions.
-- Anyone is free to attend design review meetings as an observer.
-- Participation in design review meetings is restricted to Keras SIG chairs.
-- Design review meeting notes will be posted publicly after each meeting.
+
+---
+
+## Leadership
+
+### BDFL
+
+Role: final call in decisions related to the Keras API.
+
+- Francois Chollet (fchollet@google.com)
 
 ---
 
@@ -86,8 +45,7 @@ Note that:
 The purpose of our work is to democratize access to machine learning through dependable standards and usable, productive APIs.
 We seek to empower as many people as possible, from a wide diversity of backgrounds, to take ownership of ML technology and to use it to build their own solutions to their own problems.
 
-Existing machine learning technology has the potential to solve a huge amount of problems in the world today, across every industry, and to help a tremendous amount of people.
-The potential is sky-high. We've barely even started. So how do we fully realize this potential?
+Existing machine learning technology has the potential to solve a huge amount of problems in the world today, across every industry, and to help a tremendous amount of people. The potential is sky-high. We've barely even started. So how do we fully realize this potential?
 
 We believe that we will only fully realize the potential of machine learning if it becomes a tool in everyone's hands -- not just a technology developed behind closed doors by an "AI industry", that you could only deploy by waiting for a turnkey cloud API to become available commercially, or by contracting an expensive consulting firm. We can't wait for experts to solve every problem -- experts at large tech companies don't even have visibility into a tiny fraction of the problems that can be solved. End users should solve their own problems. And our mission is to empower them to do just that.
 
@@ -97,7 +55,10 @@ Our mission is to make these capabilities available to anyone with basic compute
 
 ## Code of conduct
 
-In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone. All activity connected with this SIG will abide by the [Code of Conduct](https://github.com/tensorflow/tensorflow/blob/master/CODE_OF_CONDUCT.md).
+In the interest of fostering an open and welcoming environment,
+we as contributors and maintainers pledge to making participation in our project
+and our community a harassment-free experience for everyone.
+All activity will abide by the [Code of Conduct](https://github.com/tensorflow/tensorflow/blob/master/CODE_OF_CONDUCT.md).
 
 ---
 
