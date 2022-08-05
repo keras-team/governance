@@ -111,13 +111,13 @@ class FasterRCNN(tf.keras.Model):
     with tf.GradientTape() as tape:
       outputs = self(x, training=True)
       # Compute RPN losses using targets from input pipeline, this will normalize by N_cls and N_reg as well
-      rpn_cls_loss = rpn_cls_loss_fn(rpn_cls_targets, outputs["rpn_cls_pred"])
-      rpn_box_loss = rpn_reg_loss_fn(rpn_box_targets, outputs["rpn_boxes_pred"])
+      rpn_cls_loss = rpn_cls_loss_fn(rpn_cls_targets, outputs["rpn_cls_pred"], rpn_cls_weights)
+      rpn_box_loss = rpn_reg_loss_fn(rpn_box_targets, outputs["rpn_boxes_pred"], rpn_box_weights)
       # Compute RCNN losses which only picks k-th bbox prediction where k is the predicted class
       rois = outputs["rpn_rois"]
-      rcnn_cls_true, rcnn_box_true = self.rcnn_labeler(rois, gt_boxes, gt_labels)
-      rcnn_cls_loss = rcnn_cls_loss_fn(rcnn_scores_true, outputs["rcnn_cls_scores"])
-      rcnn_box_loss = rcnn_reg_loss_fn(rcnn_box_true, outputs["rcnn_bbox_offsets"])
+      rcnn_cls_true, rcnn_box_true, rcnn_cls_weights, rcnn_box_weights = self.rcnn_labeler(rois, gt_boxes, gt_labels)
+      rcnn_cls_loss = rcnn_cls_loss_fn(rcnn_scores_true, outputs["rcnn_cls_scores"], rcnn_cls_weights)
+      rcnn_box_loss = rcnn_reg_loss_fn(rcnn_box_true, outputs["rcnn_bbox_offsets"], rcnn_box_weights)
       total_loss = rpn_cls_loss + rpn_box_loss + rcnn_cls_loss + rcnn_box_loss
     self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
     return self.compute_metrics(...)
